@@ -1,0 +1,2249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Tournament</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+    <style>
+        :root {
+            --bg-primary: #05051E;
+            --bg-secondary: #141432;
+            --bg-tertiary: #1F1F40;
+            --text-primary: #FFFFFF;
+            --text-secondary: #A0A0B8;
+            --accent-cyan: #00E0FF;
+            --accent-pink: #FF3D71;
+            --border-color: #2a2a4a;
+            --btn-green: #4CAF50;
+            --btn-orange: #FF9800;
+            --card-bg: #151530;
+            --header-height: 70px;
+            --bottom-nav-height: 80px;
+        }
+
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+        html, body {
+            background-color: var(--bg-primary);
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            max-width: 100vw;
+            overflow-x: hidden;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            color: var(--text-primary);
+            min-height: 100vh;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes popIn {
+            0% { opacity: 0; transform: scale(0.85); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+        .animate-enter { animation: fadeUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+
+        .main-content {
+            padding-left: 15px;
+            padding-right: 15px;
+            max-width: 100%;
+            overflow-x: hidden;
+            margin-top: var(--header-height);
+            padding-bottom: var(--bottom-nav-height);
+            min-height: calc(100vh - var(--header-height));
+        }
+        .section { display: none; width: 100%; }
+        .section.active { display: block; animation: fadeUp 0.4s ease-out forwards; }
+
+        #login-section {
+            padding: 0;
+            margin: 0;
+            min-height: 100vh;
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+        #login-section.active {
+            display: flex;
+            animation: fadeUp 0.4s ease-out forwards;
+        }
+
+        body.login-active .main-content {
+            margin-top: 0;
+            padding: 0;
+            min-height: 100vh;
+        }
+        body.login-active .app-header {
+            display: none !important;
+        }
+        body.login-active .bottom-nav-container {
+            display: none !important;
+        }
+
+        button, .category-card, .game-card, .btn-action, .support-card, .tournament-card, .p-menu-item, .wallet-button, .slot-row, .md-tab, .tab-item {
+            transition: transform 0.18s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.2s, border-color 0.2s, opacity 0.2s;
+            will-change: transform;
+        }
+        button:active, .category-card:active, .game-card:active, .btn-action:active, .support-card:active, .tournament-card:active, .p-menu-item:active, .wallet-button:active, .slot-row:not(.disabled):active, .md-tab:active, .tab-item:active {
+            transform: scale(0.96);
+            opacity: 0.92;
+        }
+
+        /* === HEADER === */
+        .app-header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            width: 100%;
+            height: var(--header-height);
+            background-color: var(--bg-primary);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 15px;
+            z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            transition: background-color 0.3s ease;
+        }
+        .header-left { display: flex; align-items: center; gap: 0.6rem; min-width: 0; flex: 1; }
+        .user-info { display: flex; align-items: center; gap: 0.6rem; min-width: 0; }
+        .user-avatar {
+            width: 42px; height: 42px; border-radius: 50%;
+            background-color: var(--accent-cyan); color: var(--bg-primary);
+            display: flex; justify-content: center; align-items: center;
+            font-weight: 700; font-size: 1rem; text-transform: uppercase;
+            box-shadow: 0 0 10px rgba(0, 224, 255, 0.3);
+            flex-shrink: 0;
+        }
+        .welcome-text { min-width: 0; }
+        .welcome-text h2 { font-size: 0.75rem; color: var(--text-secondary); margin: 0; font-weight: 400; }
+        .welcome-text p { font-size: 0.95rem; color: var(--text-primary); margin: 0; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 120px; }
+
+        .header-page-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            letter-spacing: 0.3px;
+        }
+        .header-back-button {
+            color: var(--text-primary);
+            font-size: 1.3rem;
+            padding: 8px;
+            margin-right: 5px;
+            border-radius: 50%;
+            background: transparent;
+            border: none;
+            transition: background 0.2s;
+        }
+        .header-back-button:active { background: rgba(255,255,255,0.1); }
+
+        .wallet-button {
+            display: flex; align-items: center; gap: 0.5rem;
+            background-color: rgba(255,255,255,0.05);
+            border: 1px solid rgba(0, 224, 255, 0.3);
+            padding: 0.35rem 0.45rem 0.35rem 0.9rem; border-radius: 50px;
+            text-decoration: none; color: white; flex-shrink: 0;
+        }
+        .wallet-text { font-weight: 600; font-size: 0.95rem; }
+        .wallet-plus {
+            background-color: var(--accent-cyan); color: var(--bg-primary);
+            border-radius: 50%; width: 22px; height: 22px;
+            display: inline-flex; justify-content: center; align-items: center;
+            font-weight: bold; font-size: 0.95rem;
+        }
+
+        /* === WALLET === */
+        .wallet-card {
+            background: linear-gradient(135deg, var(--accent-pink), var(--accent-cyan));
+            border-radius: 20px; padding: 25px 20px; color: white; margin-bottom: 25px;
+            box-shadow: 0 10px 25px rgba(0, 100, 255, 0.3); position: relative; overflow: hidden;
+        }
+        .wallet-card::after { content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: radial-gradient(circle, rgba(255,255,255,0.15) 0%, transparent 60%); pointer-events: none; }
+        .wallet-label { font-size: 0.75rem; text-transform: uppercase; opacity: 0.85; letter-spacing: 0.5px; margin-bottom: 5px; }
+        .wallet-balance { font-size: 2.2rem; font-weight: 700; margin-bottom: 15px; line-height: 1.1; }
+        .wallet-divider { height: 1px; background-color: rgba(255,255,255,0.25); margin-bottom: 15px; }
+        .wallet-details { display: flex; justify-content: space-between; }
+        .wallet-sub-value { font-size: 1.1rem; font-weight: 600; }
+        .wallet-actions { display: flex; gap: 15px; margin-bottom: 30px; }
+        .btn-action { flex: 1; border: none; border-radius: 12px; padding: 14px; font-weight: 600; color: white; display: flex; align-items: center; justify-content: center; gap: 10px; font-size: 0.9rem; box-shadow: 0 4px 10px rgba(0,0,0,0.3); cursor: pointer; }
+        .btn-add { background-color: var(--btn-green); }
+        .btn-withdraw { background-color: var(--btn-orange); }
+
+        /* === SUPPORT === */
+        .support-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; padding: 5px; margin-top: 10px; }
+        .support-card {
+            background-color: var(--card-bg); border-radius: 16px; padding: 20px 10px;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            text-align: center; cursor: pointer; border: 1px solid var(--border-color);
+            height: 140px;
+        }
+        .support-icon { font-size: 2.4rem; margin-bottom: 12px; }
+        .support-name { font-size: 0.9rem; font-weight: 500; color: var(--text-primary); }
+        .icon-whatsapp { color: #25D366; } .icon-telegram { color: #0088cc; } .icon-instagram { color: #E1306C; } .icon-youtube { color: #FF0000; } .icon-email { color: #FFB300; } .icon-website { color: #5C5CFF; }
+
+        /* === WITHDRAW === */
+        .withdraw-balance-card { background-color: var(--bg-secondary); border-radius: 16px; padding: 20px; margin-bottom: 25px; display: flex; justify-content: space-between; align-items: center; border: 1px solid var(--border-color); }
+        .wb-left { display: flex; align-items: center; gap: 10px; color: var(--text-secondary); font-size: 0.9rem; }
+        .wb-icon { color: var(--accent-cyan); font-size: 1.2rem; }
+        .wb-amount { font-size: 1.2rem; font-weight: 600; color: var(--text-primary); }
+        .custom-input { background-color: var(--bg-secondary); border: 1px solid var(--border-color); color: var(--text-primary); padding: 15px; border-radius: 12px; font-size: 1rem; width: 100%; }
+        .custom-input::placeholder { color: #565676; }
+        .custom-input:focus { background-color: var(--bg-secondary); border-color: var(--accent-cyan); box-shadow: none; color: var(--text-primary); outline: none; }
+        .btn-cyan-block {
+            width: 100%; background-color: var(--accent-cyan); color: #000;
+            font-weight: 700; padding: 16px; border-radius: 12px; border: none;
+            font-size: 1.1rem; margin-bottom: 30px; cursor: pointer;
+        }
+
+        /* === PROFILE === */
+        .profile-new-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+        .profile-new-avatar { width: 65px; height: 65px; border-radius: 50%; background-color: var(--accent-cyan); color: var(--bg-primary); display: flex; justify-content: center; align-items: center; font-size: 1.6rem; font-weight: 700; text-transform: uppercase; flex-shrink: 0; }
+        .profile-new-info h3 { margin: 0; font-size: 1.1rem; font-weight: 600; color: var(--text-primary); }
+        .profile-new-info p { margin: 0; color: var(--text-secondary); font-size: 0.85rem; }
+        .profile-edit-btn { cursor: pointer; padding: 8px; border-radius: 50%; transition: background 0.2s; }
+        .profile-edit-btn:active { background: rgba(255,255,255,0.1); }
+        .profile-edit-btn i { color: var(--accent-cyan); font-size: 1.2rem; }
+        .profile-stats-card { background-color: var(--bg-secondary); border-radius: 16px; padding: 20px; margin-bottom: 25px; display: flex; justify-content: space-between; text-align: center; }
+        .p-stat-item { flex: 1; }
+        .p-stat-icon { font-size: 1.4rem; color: var(--accent-cyan); margin-bottom: 5px; }
+        .p-stat-val { display: block; font-size: 1.1rem; font-weight: 600; color: var(--text-primary); line-height: 1.2; }
+        .p-stat-label { font-size: 0.7rem; color: var(--text-secondary); }
+        .profile-menu-card { background-color: var(--bg-secondary); border-radius: 16px; padding: 10px 0; overflow: hidden; }
+        .p-menu-item { display: flex; align-items: center; padding: 15px 20px; text-decoration: none; color: var(--text-primary); cursor: pointer; }
+        .p-menu-item:active { background-color: rgba(255,255,255,0.05); }
+        .p-menu-icon { width: 30px; font-size: 1.1rem; color: var(--text-secondary); }
+        .p-menu-text { flex-grow: 1; font-size: 0.95rem; font-weight: 500; }
+        .p-menu-arrow { color: var(--text-secondary); font-size: 0.8rem; }
+        .menu-divider { height: 1px; background-color: var(--border-color); margin: 5px 20px; }
+        .text-cyan { color: var(--accent-cyan) !important; }
+        .text-red { color: var(--accent-pink) !important; }
+
+        /* === HOME === */
+        .swiper {
+            width: 100%;
+            margin: 0 auto 1.5rem auto;
+            border-radius: 16px;
+            background-color: var(--bg-secondary);
+            aspect-ratio: 2 / 1;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+        }
+        .swiper-slide img { display: block; width: 100%; height: 100%; object-fit: cover; }
+        .swiper-pagination-bullet-active { background-color: var(--accent-cyan) !important; width: 20px; border-radius: 4px; }
+
+        .section-header { text-align: center; margin-bottom: 1.5rem; }
+        .section-header h2 { color: var(--text-primary); font-size: 1.3rem; font-weight: 600; margin-bottom: 5px; }
+        .section-header p { color: var(--text-secondary); font-size: 0.85rem; }
+
+        .contest-categories {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-bottom: 2rem;
+        }
+        .category-card {
+            background-color: var(--card-bg);
+            border-radius: 20px;
+            padding: 20px 8px;
+            text-align: center;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+        .category-card .icon-circle {
+            width: 45px; height: 45px;
+            border-radius: 50%;
+            border: 2px solid var(--accent-pink);
+            display: flex; justify-content: center; align-items: center;
+            margin: 0 auto 10px auto;
+            color: var(--accent-pink);
+            font-size: 1.1rem;
+            background: rgba(255, 61, 113, 0.1);
+        }
+        .category-card span {
+            display: block;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            letter-spacing: 0.3px;
+            text-transform: uppercase;
+        }
+
+        .game-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; padding-bottom: 1rem; }
+        .game-card {
+            width: 100%;
+            border-radius: 18px;
+            overflow: hidden;
+            cursor: pointer;
+            text-align: center;
+            background-color: var(--card-bg);
+            padding-bottom: 10px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        }
+        .game-card img {
+            width: 100%;
+            aspect-ratio: 1/1;
+            object-fit: cover;
+            border-radius: 18px;
+            margin-bottom: 8px;
+            display: block;
+        }
+        .game-card .game-title {
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+            font-weight: 700;
+            text-transform: uppercase;
+            padding: 0 5px;
+        }
+
+        /* === PRIVACY === */
+        .privacy-content h2 { font-size: 1.4rem; margin-bottom: 0.5rem; color: var(--text-primary); }
+        .privacy-content h4 { color: var(--text-primary); margin-top: 1.5rem; margin-bottom: 1rem; font-size: 1.05rem; }
+        .privacy-content p { color: var(--text-secondary); font-size: 0.9rem; line-height: 1.6; margin-bottom: 1rem; }
+        .privacy-content ul { padding-left: 20px; color: var(--text-secondary); margin-bottom: 1rem; }
+        .privacy-content li { margin-bottom: 10px; font-size: 0.9rem; line-height: 1.6; }
+        .privacy-content strong { color: var(--text-primary); font-weight: 600; }
+
+        /* === TOURNAMENT === */
+        .tournament-card {
+            background-color: var(--card-bg);
+            border-radius: 16px;
+            overflow: hidden;
+            margin-bottom: 20px;
+            border: 1px solid var(--border-color);
+            padding: 0;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+            cursor: pointer;
+        }
+        .t-banner-img {
+            width: 100%;
+            height: auto;
+            aspect-ratio: 16 / 9;
+            object-fit: cover;
+            display: block;
+        }
+        .t-content-body { padding: 15px; }
+        .t-header-row { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 5px; }
+        .t-title-text { font-size: 1rem; font-weight: 600; color: var(--text-primary); margin: 0; line-height: 1.2; }
+        .t-date-row { display: flex; align-items: center; gap: 6px; color: var(--text-secondary); font-size: 0.8rem; margin-bottom: 15px; }
+        .t-stats-row { display: flex; justify-content: space-between; margin-bottom: 15px; padding-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .t-stat-box { text-align: center; }
+        .t-stat-label { display: block; font-size: 0.65rem; text-transform: uppercase; color: var(--text-secondary); margin-bottom: 2px; letter-spacing: 0.5px; }
+        .t-stat-value { font-size: 1rem; font-weight: 700; color: var(--accent-cyan); }
+        .t-progress-area { margin-bottom: 5px; }
+        .t-progress-track { width: 100%; height: 6px; background-color: var(--border-color); border-radius: 10px; overflow: hidden; margin-bottom: 6px; }
+        .t-progress-bar { height: 100%; background-color: var(--accent-cyan); border-radius: 10px; width: 0%; transition: width 0.5s ease; }
+        .t-slots-text { font-size: 0.75rem; color: var(--text-secondary); }
+
+        .tournament-tabs {
+            display: flex;
+            justify-content: space-around;
+            background-color: transparent;
+            padding: 0;
+            margin-bottom: 20px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .tab-item {
+            color: var(--text-secondary);
+            background: none;
+            border: none;
+            padding: 10px 15px;
+            font-weight: 500;
+            font-size: 0.85rem;
+            position: relative;
+            cursor: pointer;
+            text-transform: uppercase;
+        }
+        .tab-item.active { color: var(--text-primary); font-weight: 600; }
+        .tab-item.active::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background-color: var(--accent-cyan);
+            border-radius: 3px 3px 0 0;
+        }
+
+        /* === BOTTOM NAV === */
+        .bottom-nav-container { position: fixed; bottom: 0; left: 0; width: 100%; height: var(--bottom-nav-height); z-index: 1000; pointer-events: none; }
+        .bottom-nav-bar {
+            pointer-events: auto;
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 65px;
+            background-color: var(--bg-secondary);
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            border-top-left-radius: 20px;
+            border-top-right-radius: 20px;
+            box-shadow: 0 -5px 25px rgba(0,0,0,0.5);
+            padding-bottom: env(safe-area-inset-bottom);
+            transition: background-color 0.3s ease;
+        }
+        .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #565676; background: none; border: none; height: 100%; cursor: pointer; }
+        .nav-item.active { color: var(--text-primary); } .nav-item.active i { color: var(--accent-cyan); }
+        .nav-item i { font-size: 1.6rem; margin-bottom: 2px; }
+
+        .nav-fab-wrapper { pointer-events: auto; position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%); width: 70px; height: 70px; background-color: var(--bg-primary); border-radius: 50%; display: flex; justify-content: center; align-items: center; z-index: 1002; padding: 8px; }
+        .nav-fab { width: 100%; height: 100%; background: linear-gradient(135deg, var(--bg-secondary), var(--bg-primary)); border-radius: 50%; display: flex; justify-content: center; align-items: center; box-shadow: 0 5px 15px rgba(0,0,0,0.6); color: var(--text-primary); font-size: 1.8rem; border: 2px solid var(--border-color); cursor: pointer; }
+        .nav-fab.active { color: var(--accent-cyan); border-color: var(--accent-cyan); box-shadow: 0 0 20px rgba(0, 224, 255, 0.4); transform: translateY(-5px); }
+
+        #globalLoaderEl { background: var(--bg-primary); display: flex; position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 9999; justify-content: center; align-items: center; }
+        .fancy-spinner { width: 4rem; height: 4rem; border-radius: 50%; border: 4px solid var(--bg-secondary); border-top-color: var(--accent-cyan); animation: spin 0.8s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .custom-card { background-color: var(--bg-secondary); border-radius: 16px; border: none; }
+        .form-control { background-color: var(--bg-primary); border: 1px solid var(--border-color); color: var(--text-primary); border-radius: 10px; padding: 14px; }
+        .form-control:focus { background-color: var(--bg-primary); border-color: var(--accent-cyan); color: var(--text-primary); box-shadow: none; outline: none; }
+
+        /* === MATCH DETAILS === */
+        .md-container {
+            background-color: var(--bg-primary);
+            min-height: 100vh;
+            padding-bottom: 90px;
+            position: relative;
+            z-index: 2000;
+        }
+        .md-header-overlay {
+            position: absolute; top: 0; left: 0; width: 100%; height: 60px;
+            display: flex; align-items: center; padding: 0 15px;
+            z-index: 10;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.7), transparent);
+        }
+        .md-back-btn { color: white; font-size: 1.5rem; background: none; border: none; }
+        .md-banner {
+            width: 100%; height: 240px; object-fit: cover;
+            mask-image: linear-gradient(to bottom, rgba(0,0,0,1) 80%, rgba(0,0,0,0));
+            -webkit-mask-image: linear-gradient(to bottom, rgba(0,0,0,1) 80%, rgba(0,0,0,0));
+        }
+        .md-title-overlay {
+            margin-top: -60px; padding: 0 20px; position: relative; z-index: 5;
+            text-align: center;
+        }
+        .md-match-title { font-size: 1.3rem; font-weight: 700; color: white; text-shadow: 0 2px 4px rgba(0,0,0,0.8); }
+        .md-meta-grid {
+            display: flex; justify-content: space-around;
+            padding: 10px 15px; border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+        .md-meta-item { text-align: center; }
+        .md-meta-label { font-size: 0.65rem; color: var(--text-secondary); text-transform: uppercase; margin-bottom: 2px; }
+        .md-meta-val { font-size: 0.9rem; color: var(--text-primary); font-weight: 600; display: flex; align-items: center; gap: 5px; justify-content: center; }
+        .md-time-card {
+            background: var(--bg-secondary); border-radius: 12px; margin: 15px; padding: 12px;
+            display: flex; align-items: center; justify-content: center; gap: 10px;
+            border: 1px solid var(--border-color); box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
+        .md-time-text { color: var(--text-primary); font-weight: 500; font-size: 0.9rem; }
+        .md-time-icon { color: var(--accent-cyan); }
+        .md-stats-grid {
+            display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px;
+            padding: 0 15px; margin-bottom: 15px;
+        }
+        .md-stat-card {
+            background: var(--card-bg); border-radius: 12px; padding: 15px 5px;
+            text-align: center; border: 1px solid var(--border-color);
+        }
+        .md-stat-card h5 { color: var(--text-secondary); font-size: 0.65rem; margin-bottom: 5px; text-transform: uppercase; }
+        .md-stat-card span { font-size: 1rem; font-weight: 700; color: var(--accent-cyan); }
+        .md-tabs { display: flex; border-bottom: 1px solid var(--border-color); margin-bottom: 15px; }
+        .md-tab {
+            flex: 1; text-align: center; padding: 12px;
+            background: none; border: none; color: var(--text-secondary);
+            font-size: 0.8rem; font-weight: 600; letter-spacing: 1px;
+            position: relative; cursor: pointer;
+        }
+        .md-tab.active { color: var(--accent-pink); }
+        .md-tab.active::after {
+            content: ''; position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);
+            width: 40px; height: 3px; background-color: var(--accent-pink); border-radius: 3px 3px 0 0;
+        }
+        .md-content-box { padding: 0 20px; }
+        .md-section-title { font-size: 0.95rem; color: var(--text-primary); font-weight: 600; margin-bottom: 10px; text-transform: uppercase; }
+        .md-text-block { color: var(--text-secondary); font-size: 0.85rem; line-height: 1.6; margin-bottom: 20px; }
+        .md-fixed-footer {
+            position: fixed; bottom: 0; left: 0; width: 100%;
+            background: var(--bg-primary); padding: 15px 20px;
+            box-shadow: 0 -10px 30px rgba(0,0,0,0.5); z-index: 2001;
+            border-top: 1px solid var(--border-color);
+        }
+        .btn-join-match {
+            width: 100%; background: linear-gradient(90deg, var(--accent-pink), #A0153E);
+            color: white; border: none; border-radius: 50px; padding: 14px;
+            font-size: 1.05rem; font-weight: 700; text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 5px 20px rgba(255, 61, 113, 0.4);
+        }
+
+        /* === SLOT === */
+        .slot-list-header { display: flex; justify-content: space-between; padding: 15px 20px; background-color: var(--bg-secondary); color: var(--text-secondary); font-size: 0.8rem; font-weight: 600; text-transform: uppercase; }
+        .slot-list-scroll {
+            height: calc(100vh - 230px);
+            overflow-y: auto;
+            padding-bottom: 120px;
+        }
+        .slot-row { display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; border-bottom: 1px solid var(--border-color); cursor: pointer; }
+        .slot-number { color: var(--text-primary); font-weight: 600; }
+        .slot-checkbox { width: 24px; height: 24px; border: 2px solid #565676; border-radius: 4px; display: flex; justify-content: center; align-items: center; }
+        .slot-row.active .slot-checkbox { background-color: var(--accent-cyan); border-color: var(--accent-cyan); color: var(--bg-primary); }
+        .slot-row.active .slot-checkbox::after { content: '\f00c'; font-family: 'Font Awesome 6 Free'; font-weight: 900; font-size: 14px; }
+        .slot-row.disabled { opacity: 0.5; pointer-events: none; }
+        .slot-row.disabled .slot-checkbox { background-color: #333; border-color: #333; }
+        .slot-footer {
+            position: fixed; bottom: 0; left: 0; width: 100%; height: 80px;
+            background-color: var(--bg-primary); border-top: 1px solid var(--border-color);
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 5 20px; z-index: 2002;
+        }
+        .slot-footer-info span { display: block; font-size: 0.7rem; color: var(--text-secondary); text-transform: uppercase; margin-bottom: 2px; }
+        .slot-footer-info strong { display: block; font-size: 1.3rem; color: var(--text-primary); font-weight: 700; }
+        .btn-slot-next { background-color: var(--accent-cyan); color: #000; font-weight: 700; padding: 10px 30px; border-radius: 50px; border: none; font-size: 1rem; cursor: pointer; }
+
+        /* === PLAYER DETAILS === */
+        #playerDetailsFormContainer { padding-bottom: 160px; }
+        .details-card { background-color: var(--card-bg); border-radius: 12px; padding: 20px; margin: 20px 0; border: 1px solid var(--border-color); }
+        .details-title { color: var(--text-primary); font-size: 0.95rem; margin-bottom: 20px; font-weight: 600; }
+        .details-input-box { margin-bottom: 20px; }
+        .details-label { color: var(--text-secondary); font-size: 0.8rem; margin-bottom: 8px; display: block; }
+        .details-input { width: 100%; background: transparent; border: none; border-bottom: 1px solid #565676; color: var(--text-primary); padding: 8px 0; font-size: 1rem; border-radius: 0; }
+        .details-input:focus { outline: none; border-bottom-color: var(--accent-cyan); }
+        .details-footer {
+            position: fixed; bottom: 0; left: 0; width: 100%;
+            background-color: var(--bg-primary); border-top: 1px solid var(--border-color);
+            padding: 15px 20px; z-index: 2002;
+        }
+        .details-total-text { font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 10px; font-weight: 500; }
+        .details-total-text strong { color: var(--text-primary); font-size: 1.1rem; margin-left: 5px; }
+        .btn-details-confirm { width: 100%; background-color: #2e2e4d; color: white; font-weight: 700; padding: 14px; border-radius: 50px; border: none; font-size: 1rem; letter-spacing: 0.5px; cursor: pointer; }
+        .btn-details-confirm.ready { background-color: var(--btn-green); }
+
+        /* === RESULT === */
+        .btn-view-result {
+            width: 100%; background: #FFD700; color: #000;
+            border: none; border-radius: 50px; padding: 14px;
+            font-size: 1rem; font-weight: 800; text-transform: uppercase;
+            box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3); margin-top: 10px; cursor: pointer;
+        }
+        .tab-content-area { display: none; padding: 15px 5px; }
+        .tab-content-area.active { display: block; animation: fadeUp 0.3s ease; }
+        .prize-row { display: flex; justify-content: space-between; padding: 12px 15px; border-bottom: 1px solid rgba(255,255,255,0.05); align-items: center; }
+        .prize-rank { display: flex; align-items: center; gap: 10px; font-weight: 600; color: var(--text-primary); }
+        .prize-icon { color: #FFD700; font-size: 1.1rem; }
+        .prize-amount { color: var(--accent-cyan); font-weight: 700; }
+        .participant-row { padding: 12px 15px; border-bottom: 1px solid rgba(255,255,255,0.05); color: var(--text-secondary); display: flex; gap: 15px; }
+        .participant-index { width: 25px; color: var(--text-secondary); font-family: monospace; }
+        .participant-name { color: var(--text-primary); font-weight: 500; }
+        .result-meta { text-align: center; color: var(--text-secondary); font-size: 0.8rem; margin: 15px 0; }
+        .full-result-bar {
+            background-color: #D32F2F; color: white;
+            text-align: center; font-weight: 700; padding: 10px;
+            text-transform: uppercase; letter-spacing: 1px; font-size: 0.9rem;
+        }
+        .result-table-header {
+            display: grid; grid-template-columns: 0.5fr 3fr 1fr 1fr 1fr;
+            background-color: #0091EA; color: white;
+            padding: 10px 5px; font-size: 0.65rem; font-weight: 700; text-transform: uppercase;
+        }
+        .result-item-row {
+            display: grid; grid-template-columns: 0.5fr 3fr 1fr 1fr 1fr;
+            padding: 12px 5px; border-bottom: 1px solid var(--border-color);
+            align-items: center; background-color: var(--bg-secondary);
+        }
+        .res-pos { font-weight: 700; color: var(--text-primary); font-size: 0.8rem; }
+        .res-name { color: var(--text-primary); font-size: 0.85rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .res-rank-val { color: var(--text-primary); font-weight: 700; text-align: center; font-size: 0.8rem; }
+        .res-kill { color: var(--text-primary); text-align: center; font-size: 0.8rem; }
+        .res-win { color: #FFD700; font-weight: 700; text-align: right; font-size: 0.8rem; }
+
+        /* === CUSTOM MODAL === */
+        .custom-modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.75);
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
+            z-index: 99999;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        .custom-modal-overlay.show { display: flex; }
+
+        .custom-modal-box {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 25px 22px 20px 22px;
+            width: 100%;
+            max-width: 380px;
+            text-align: center;
+            animation: popIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        .custom-modal-icon {
+            width: 60px; height: 60px;
+            border-radius: 50%;
+            margin: 0 auto 15px auto;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.8rem;
+        }
+        .custom-modal-icon.success { background: rgba(76, 175, 80, 0.15); color: #4CAF50; }
+        .custom-modal-icon.error { background: rgba(255, 61, 113, 0.15); color: var(--accent-pink); }
+        .custom-modal-icon.warning { background: rgba(255, 152, 0, 0.15); color: #FF9800; }
+        .custom-modal-icon.info { background: rgba(0, 224, 255, 0.15); color: var(--accent-cyan); }
+        .custom-modal-icon.confirm { background: rgba(0, 224, 255, 0.15); color: var(--accent-cyan); }
+
+        .custom-modal-title { font-size: 1.15rem; font-weight: 700; color: var(--text-primary); margin-bottom: 8px; }
+        .custom-modal-message { font-size: 0.9rem; color: var(--text-secondary); line-height: 1.5; margin-bottom: 20px; word-break: break-word; text-align: left; }
+        .custom-modal-actions { display: flex; gap: 10px; }
+        .custom-modal-btn {
+            flex: 1; padding: 12px; border-radius: 12px; border: none;
+            font-weight: 600; font-size: 0.9rem; cursor: pointer;
+        }
+        .custom-modal-btn:active { transform: scale(0.96); }
+        .custom-modal-btn.primary { background: var(--accent-cyan); color: #000; }
+        .custom-modal-btn.danger { background: var(--accent-pink); color: white; }
+        .custom-modal-btn.secondary { background: transparent; color: var(--text-secondary); border: 1px solid var(--border-color); }
+        .custom-modal-btn.success { background: #4CAF50; color: white; }
+
+        /* === EDIT PROFILE FORM STYLES === */
+        .edit-profile-field { text-align: left; margin-bottom: 15px; }
+        .edit-profile-field label {
+            font-size: 0.75rem; color: var(--text-secondary);
+            text-transform: uppercase; letter-spacing: 0.5px;
+            margin-bottom: 6px; display: block; font-weight: 600;
+        }
+        .edit-profile-field input {
+            width: 100%; background: var(--bg-primary);
+            border: 1px solid var(--border-color); color: var(--text-primary);
+            padding: 12px 14px; border-radius: 10px; font-size: 0.95rem;
+            outline: none; transition: border-color 0.2s;
+        }
+        .edit-profile-field input:focus { border-color: var(--accent-cyan); }
+        .edit-profile-field input:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        .bottom-nav-bar, .slot-footer, .details-footer, .md-fixed-footer {
+            padding-bottom: env(safe-area-inset-bottom);
+        }
+
+        /* === THEMES === */
+        body.theme-light {
+            --bg-primary: #F5F7FB; --bg-secondary: #FFFFFF; --bg-tertiary: #E8EBF2;
+            --text-primary: #0F172A; --text-secondary: #64748B;
+            --border-color: #E2E8F0; --card-bg: #FFFFFF;
+        }
+        body.theme-white {
+            --bg-primary: #FFFFFF; --bg-secondary: #F8F9FC; --bg-tertiary: #EEF1F8;
+            --text-primary: #111827; --text-secondary: #6B7280;
+            --border-color: #E5E7EB; --card-bg: #FFFFFF;
+        }
+        body.theme-black {
+            --bg-primary: #000000; --bg-secondary: #0A0A0A; --bg-tertiary: #141414;
+            --text-primary: #FFFFFF; --text-secondary: #A0A0A0;
+            --border-color: #1F1F1F; --card-bg: #0F0F0F;
+        }
+        body.theme-blue {
+            --bg-primary: #0A1929; --bg-secondary: #112240; --bg-tertiary: #1A2F4F;
+            --text-primary: #FFFFFF; --text-secondary: #8892B0;
+            --border-color: #1E3A5F; --card-bg: #112240;
+        }
+        body.theme-green {
+            --bg-primary: #0A1F0A; --bg-secondary: #142814; --bg-tertiary: #1E3A1E;
+            --text-primary: #FFFFFF; --text-secondary: #9CB89C;
+            --border-color: #234523; --card-bg: #142814;
+        }
+
+        /* ============================================= */
+        /* ===== PREMIUM LOGIN / SIGNUP REDESIGN ====== */
+        /* ============================================= */
+        .auth-wrapper {
+            width: 100%;
+            max-width: 440px;
+            margin: 0 auto;
+            padding: 20px 15px 30px 15px;
+            position: relative;
+        }
+
+        .auth-card {
+            background: linear-gradient(165deg, rgba(20,20,50,0.95), rgba(10,10,30,0.98));
+            border: 1px solid rgba(0,224,255,0.15);
+            border-radius: 28px;
+            padding: 35px 28px 30px 28px;
+            box-shadow: 0 25px 80px rgba(0,0,0,0.6), 0 0 60px rgba(0,224,255,0.05);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .auth-card::before {
+            content: '';
+            position: absolute;
+            top: -1px; left: -1px; right: -1px;
+            height: 3px;
+            background: linear-gradient(90deg, var(--accent-cyan), var(--accent-pink), var(--accent-cyan));
+            background-size: 200% 100%;
+            animation: gradientShift 4s linear infinite;
+            border-radius: 28px 28px 0 0;
+        }
+
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            100% { background-position: 200% 50%; }
+        }
+
+        .auth-logo-area { text-align: center; margin-bottom: 25px; }
+        .auth-logo-img {
+            width: 80px; height: 80px;
+            border-radius: 22px;
+            object-fit: cover;
+            box-shadow: 0 8px 30px rgba(0,224,255,0.25), 0 0 0 3px rgba(0,224,255,0.1);
+            margin-bottom: 12px;
+            background: #333;
+        }
+        .auth-app-name {
+            font-size: 1.5rem;
+            font-weight: 800;
+            letter-spacing: 1.5px;
+            background: linear-gradient(90deg, var(--accent-cyan), #7B61FF, var(--accent-pink));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 4px;
+        }
+        .auth-tagline {
+            font-size: 0.78rem;
+            color: var(--text-secondary);
+            letter-spacing: 0.3px;
+            font-weight: 400;
+        }
+
+        .auth-divider {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin: 22px 0 20px 0;
+        }
+        .auth-divider-line {
+            flex: 1;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(0,224,255,0.2), transparent);
+        }
+        .auth-divider-text {
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-weight: 600;
+            opacity: 0.7;
+        }
+
+        .auth-form-title {
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 5px;
+            text-align: center;
+        }
+        .auth-form-subtitle {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            text-align: center;
+            margin-bottom: 22px;
+            font-weight: 400;
+        }
+
+        .auth-input-group { margin-bottom: 16px; position: relative; }
+        .auth-input-group label {
+            font-size: 0.72rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            font-weight: 600;
+            margin-bottom: 7px;
+            display: block;
+        }
+        .auth-input-group input {
+            width: 100%;
+            background: rgba(10,10,30,0.7);
+            border: 1.5px solid rgba(255,255,255,0.08);
+            color: var(--text-primary);
+            padding: 15px 16px 15px 48px;
+            border-radius: 14px;
+            font-size: 0.95rem;
+            outline: none;
+            transition: all 0.25s ease;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 400;
+        }
+        .auth-input-group input::placeholder {
+            color: rgba(160,160,184,0.5);
+            font-size: 0.88rem;
+        }
+        .auth-input-group input:focus {
+            border-color: var(--accent-cyan);
+            background: rgba(0,224,255,0.04);
+            box-shadow: 0 0 0 4px rgba(0,224,255,0.08), 0 0 20px rgba(0,224,255,0.05);
+        }
+        .auth-input-icon {
+            position: absolute;
+            left: 16px;
+            bottom: 15px;
+            color: var(--text-secondary);
+            font-size: 1rem;
+            transition: color 0.25s;
+            pointer-events: none;
+            opacity: 0.6;
+        }
+        .auth-input-group input:focus ~ .auth-input-icon {
+            color: var(--accent-cyan);
+            opacity: 1;
+        }
+
+        .auth-btn-primary {
+            width: 100%;
+            background: linear-gradient(135deg, var(--accent-cyan), #0099CC);
+            color: #000;
+            font-weight: 700;
+            padding: 16px;
+            border-radius: 14px;
+            border: none;
+            font-size: 1rem;
+            cursor: pointer;
+            letter-spacing: 0.5px;
+            transition: all 0.25s ease;
+            font-family: 'Poppins', sans-serif;
+            box-shadow: 0 8px 30px rgba(0,224,255,0.25);
+            position: relative;
+            overflow: hidden;
+        }
+        .auth-btn-primary:active {
+            transform: scale(0.97);
+            box-shadow: 0 4px 15px rgba(0,224,255,0.2);
+        }
+
+        .auth-switch-text {
+            text-align: center;
+            margin-top: 22px;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+        .auth-switch-link {
+            color: var(--accent-cyan);
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            transition: opacity 0.2s;
+        }
+        .auth-switch-link:hover { opacity: 0.8; }
+
+        .auth-features {
+            display: flex;
+            justify-content: center;
+            gap: 25px;
+            margin-top: 28px;
+            padding-top: 22px;
+            border-top: 1px solid rgba(255,255,255,0.05);
+        }
+        .auth-feature-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+        }
+        .auth-feature-icon {
+            width: 38px;
+            height: 38px;
+            border-radius: 12px;
+            background: rgba(0,224,255,0.08);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--accent-cyan);
+            font-size: 1rem;
+        }
+        .auth-feature-label {
+            font-size: 0.62rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 600;
+        }
+
+        .auth-bottom-text {
+            text-align: center;
+            font-size: 0.7rem;
+            color: rgba(160,160,184,0.4);
+            margin-top: 20px;
+            letter-spacing: 0.3px;
+        }
+    
+/* ===== MINEZONE MINECRAFT UI OVERRIDES ===== */
+:root{--bg-primary:#020b16;--bg-secondary:#06182a;--bg-tertiary:#0b2740;--text-primary:#f4fbff;--text-secondary:#9bb3c7;--accent-cyan:#21d4ff;--accent-pink:#39ff88;--border-color:rgba(57,198,255,.20);--btn-green:#21e96f;--btn-orange:#ffb020;--card-bg:#061b30}
+body{background:radial-gradient(circle at 50% -10%,rgba(21,107,181,.24),transparent 38%),linear-gradient(180deg,#020913 0%,#03101d 55%,#020913 100%)}
+.main-content{max-width:560px;margin-left:auto;margin-right:auto;padding-left:14px;padding-right:14px}
+body.public-active .main-content,body.login-active .main-content{margin-top:0;padding:0;max-width:100%;min-height:100vh}
+body.public-active .app-header,body.public-active .bottom-nav-container,body.login-active .app-header,body.login-active .bottom-nav-container{display:none!important}
+.app-header{background:rgba(2,11,22,.94);border-bottom:1px solid rgba(60,190,255,.12);backdrop-filter:blur(18px)}
+.user-avatar{background:linear-gradient(135deg,#21d4ff,#1f6fff);border:2px solid rgba(255,255,255,.12);box-shadow:0 0 18px rgba(33,212,255,.28)}
+.wallet-button{background:rgba(7,28,49,.85);border:1px solid rgba(33,212,255,.28)}.wallet-plus{background:linear-gradient(135deg,#21e96f,#16c75c);color:#00130a}
+/* Landing */
+#landing-section{min-height:100vh;display:none;align-items:center;justify-content:center;padding:22px 16px 28px;overflow:hidden}#landing-section.active{display:flex}
+.landing-shell{width:100%;max-width:480px;min-height:calc(100vh - 44px);display:flex;flex-direction:column;justify-content:space-between;position:relative}
+.landing-top{display:flex;align-items:center;justify-content:space-between;padding:4px 2px 12px}.mine-logo{display:flex;align-items:center;gap:10px;font-weight:800}.mine-logo-mark{width:42px;height:42px;display:grid;place-items:center;background:#2cff73;color:#04100a;font-size:24px;font-weight:900;border-radius:7px;box-shadow:0 0 28px rgba(44,255,115,.28)}.mine-logo-name{font-size:1.55rem;color:#fff}.mine-logo-name span{color:#2cff73}.landing-badge{font-size:.68rem;color:#92b1c7;border:1px solid rgba(57,198,255,.2);border-radius:999px;padding:7px 10px;background:rgba(7,28,49,.6)}
+.landing-hero{position:relative;min-height:54vh;display:flex;align-items:flex-end;overflow:hidden;border:1px solid rgba(54,199,255,.22);border-radius:28px;background:radial-gradient(circle at 72% 30%,rgba(31,130,255,.28),transparent 28%),linear-gradient(180deg,rgba(5,38,73,.18),rgba(1,11,21,.98) 82%),linear-gradient(135deg,#062c3e,#06375b 42%,#031321);box-shadow:0 24px 70px rgba(0,0,0,.38)}
+.landing-hero:before{content:"";position:absolute;inset:0;background:linear-gradient(135deg,transparent 0 45%,rgba(52,255,118,.1) 45% 47%,transparent 47%),linear-gradient(35deg,transparent 0 56%,rgba(33,212,255,.09) 56% 58%,transparent 58%)}
+.block-scene{position:absolute;inset:0;overflow:hidden;opacity:.85}.block-scene i{position:absolute;width:58px;height:58px;border:1px solid rgba(255,255,255,.05);box-shadow:inset 10px 10px 0 rgba(255,255,255,.025),inset -10px -10px 0 rgba(0,0,0,.08);transform:skewY(-8deg)}
+.block-scene i:nth-child(1){left:8%;top:20%;background:#164d69}.block-scene i:nth-child(2){left:20%;top:28%;background:#1a6a4a}.block-scene i:nth-child(3){left:32%;top:18%;background:#0f5272}.block-scene i:nth-child(4){right:13%;top:22%;background:#17517b}.block-scene i:nth-child(5){right:28%;top:35%;background:#1c6849}.block-scene i:nth-child(6){left:6%;bottom:27%;background:#174d37}.block-scene i:nth-child(7){left:32%;bottom:20%;background:#123f5a}.block-scene i:nth-child(8){right:6%;bottom:25%;background:#0f4a68}
+.pixel-avatar{position:absolute;left:50%;top:27%;transform:translateX(-50%);width:96px;height:96px;background:linear-gradient(90deg,transparent 0 15%,#8b5a38 15% 85%,transparent 85%),linear-gradient(#2d241e 0 22%,#8b5a38 22% 78%,#7c4d2f 78% 100%);box-shadow:0 18px 30px rgba(0,0,0,.35)}.pixel-avatar:after{content:"";position:absolute;left:18px;right:18px;top:36px;height:12px;background:linear-gradient(90deg,#14202a 0 25%,transparent 25% 75%,#14202a 75%)}
+.landing-copy{position:relative;z-index:2;padding:0 22px 24px}.landing-eyebrow{color:#2cff73;font-weight:700;font-size:.75rem;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:9px}.landing-copy h1{margin:0;font-size:clamp(2.1rem,10vw,3.35rem);line-height:.98;font-weight:800;letter-spacing:-1.8px}.landing-copy h1 span{color:#2cff73}.landing-copy p{color:#a9bfd0;font-size:.9rem;line-height:1.6;max-width:360px;margin:14px 0 0}.landing-actions{display:grid;gap:10px;margin-top:20px}.landing-btn{width:100%;border:0;border-radius:15px;padding:15px 18px;font-size:1rem;font-weight:750;cursor:pointer}.landing-btn-primary{color:#021008;background:linear-gradient(135deg,#2cff73,#18dcff);box-shadow:0 12px 30px rgba(44,255,115,.18)}.landing-btn-secondary{color:#f3fbff;background:rgba(4,19,34,.7);border:1px solid rgba(44,220,255,.35)}
+.landing-features{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:15px}.landing-feature{background:rgba(5,24,41,.72);border:1px solid rgba(55,189,255,.13);border-radius:13px;padding:11px 6px;text-align:center;color:#a9bfd0;font-size:.64rem}.landing-feature i{color:#2cff73;display:block;font-size:1rem;margin-bottom:5px}
+/* Login */
+.auth-wrapper{max-width:470px;min-height:100vh;padding:20px 16px 26px;display:flex;flex-direction:column;justify-content:center}.auth-card{background:linear-gradient(180deg,rgba(5,28,48,.97),rgba(2,14,26,.98));border:1px solid rgba(55,207,255,.18);border-radius:26px;padding:27px 20px 22px;box-shadow:0 28px 80px rgba(0,0,0,.55)}.auth-card:before{background:linear-gradient(90deg,#2cff73,#21d4ff,#2cff73)}.auth-app-name{color:#fff;background:none;-webkit-text-fill-color:initial}.auth-btn-primary{background:linear-gradient(135deg,#2cff73,#18dcff);color:#021008;box-shadow:0 10px 28px rgba(44,255,115,.16)}.auth-switch-link{color:#2cff73}.auth-feature-icon{color:#2cff73;background:rgba(44,255,115,.08)}.public-back{border:0;background:transparent;color:#91adbf;font-size:.82rem;margin-bottom:12px;cursor:pointer;text-align:left}.public-back i{color:#2cff73;margin-right:5px}
+/* Home */
+.home-topbar{display:flex;align-items:center;justify-content:space-between;margin:8px 2px 14px}.home-brand{display:flex;align-items:center;gap:10px}.home-brand-mark{width:34px;height:34px;border-radius:8px;background:#2cff73;color:#04100a;display:grid;place-items:center;font-weight:900}.home-brand strong{font-size:1.15rem}.home-brand small{display:block;color:#7896ad;font-size:.63rem}.home-notify{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;background:#061b30;border:1px solid rgba(57,198,255,.18);color:#dff7ff}
+.minecraft-hero{position:relative;overflow:hidden;min-height:210px;border-radius:22px;border:1px solid rgba(54,199,255,.22);background:linear-gradient(100deg,rgba(3,15,28,.97) 0 43%,rgba(3,15,28,.18) 72%),var(--minecraft-hero,linear-gradient(135deg,#0b4962,#07351f));background-size:cover;background-position:center;padding:24px 20px;display:flex;align-items:flex-end;box-shadow:0 16px 45px rgba(0,0,0,.32)}.minecraft-hero-content{max-width:70%;position:relative;z-index:2}.minecraft-pill{display:inline-flex;align-items:center;gap:6px;background:#2cff73;color:#021008;padding:6px 10px;border-radius:999px;font-size:.64rem;font-weight:800;margin-bottom:10px}.minecraft-hero h1{margin:0;font-size:1.8rem;line-height:1.02;font-weight:800}.minecraft-hero h1 span{color:#2cff73}.minecraft-hero p{margin:8px 0 14px;color:#c1d4e1;font-size:.72rem;line-height:1.45}.minecraft-hero-btn{border:0;border-radius:11px;padding:10px 13px;font-weight:800;font-size:.72rem;background:linear-gradient(135deg,#2cff73,#18dcff);color:#021008;cursor:pointer}
+.dashboard-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:12px 0 19px}.dashboard-stat{background:#061b30;border:1px solid rgba(55,189,255,.14);border-radius:13px;padding:11px 8px}.dashboard-stat i{color:#2cff73;font-size:.8rem;margin-bottom:6px}.dashboard-stat strong{display:block;font-size:1rem}.dashboard-stat span{color:#7995a9;font-size:.58rem}.home-section-title{display:flex;align-items:center;justify-content:space-between;margin:17px 2px 10px}.home-section-title h2{font-size:1.05rem;margin:0;font-weight:750}.home-section-title a{color:#2cff73;font-size:.68rem;cursor:pointer}.quick-actions{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}.quick-action{border:1px solid rgba(55,189,255,.13);background:#061b30;border-radius:14px;padding:12px 5px;text-align:center;color:#e7f5fb;cursor:pointer}.quick-action i{display:block;font-size:1.05rem;color:#20d8ff;margin-bottom:7px}.quick-action span{font-size:.58rem}.minecraft-mini-list{display:grid;gap:9px;padding-bottom:18px}.minecraft-mini-card{display:grid;grid-template-columns:76px 1fr auto;gap:11px;align-items:center;padding:9px;background:#061b30;border:1px solid rgba(55,189,255,.14);border-radius:16px;cursor:pointer}.minecraft-mini-card img{width:76px;height:66px;object-fit:cover;border-radius:11px;background:#0b3045}.minecraft-mini-card h3{margin:0 0 4px;font-size:.78rem}.minecraft-mini-card p{margin:0;color:#7995a9;font-size:.59rem}.mini-join{border:0;border-radius:9px;background:#2cff73;color:#021008;font-weight:800;font-size:.6rem;padding:8px 9px}.empty-minecraft{padding:22px;text-align:center;color:#7995a9;background:#061b30;border-radius:16px;border:1px dashed rgba(55,189,255,.16)}
+.minecraft-only-card{background:#061b30;border:1px solid rgba(44,255,115,.18);border-radius:18px;padding:16px;display:flex;align-items:center;gap:14px;cursor:pointer}.minecraft-only-icon{width:58px;height:58px;border-radius:12px;background:linear-gradient(135deg,#2cff73,#168b49);display:grid;place-items:center;color:#04100a;font-size:1.7rem;font-weight:900}.minecraft-only-card h3{margin:0;font-size:1rem}.minecraft-only-card p{margin:4px 0 0;color:#7995a9;font-size:.67rem}
+/* Tournament + generic visual refresh */
+.tournament-card,.custom-card,.withdraw-balance-card,.profile-stats-card,.profile-menu-card,.transactions-section,.details-card,.md-stat-card{background:#061b30!important;border-color:rgba(55,189,255,.14)!important}.t-stat-value{color:#2cff73}.t-progress-track{background:#0b3045}.t-progress-bar{background:linear-gradient(90deg,#2cff73,#21d4ff)}.btn-add,.btn-details-confirm.ready{background:#2cff73!important;color:#021008!important}.btn-cyan-block{background:linear-gradient(135deg,#2cff73,#18dcff);color:#021008}.text-cyan{color:#2cff73!important}.md-tab.active{color:#2cff73}.md-tab.active:after{background:#2cff73}.btn-join-match{background:linear-gradient(135deg,#2cff73,#18dcff);color:#021008}.slot-row.active .slot-checkbox{background:#2cff73;border-color:#2cff73;color:#021008}.btn-slot-next{background:#2cff73;color:#021008}
+/* Bottom nav */
+.bottom-nav-container{height:78px}.bottom-nav-bar{height:68px;background:rgba(3,16,29,.97);border-top:1px solid rgba(55,189,255,.13);border-radius:20px 20px 0 0;backdrop-filter:blur(18px)}.nav-fab-wrapper{display:none}.nav-spacer{display:none}.nav-item{color:#66849a}.nav-item.active,.nav-item.active i{color:#2cff73}.nav-item i{font-size:1.1rem;margin-bottom:4px}.nav-item:after{content:attr(data-label);display:block;font-size:.55rem;font-weight:600}.nav-item[data-section="history-section"],.nav-item[data-section="leaderboard-section"]{display:none}
+@media(min-width:700px){.landing-hero{min-height:620px}}
+
+    </style>
+</head>
+<body>
+
+    <header class="app-header" id="app-header">
+        <div class="header-left">
+            <button class="header-back-button" id="headerBackBtn" style="display: none;"><i class="fas fa-arrow-left"></i></button>
+            <div class="user-info" id="headerUserInfo">
+                <div class="user-avatar" id="headerAvatar"></div>
+                <div class="welcome-text">
+                    <h2 id="headerWelcomeText">Welcome,</h2>
+                    <p id="headerUserGreeting">Guest</p>
+                </div>
+            </div>
+            <div class="header-page-title" id="headerPageTitle" style="display:none;"></div>
+        </div>
+
+        <a href="#" class="wallet-button" id="headerWalletChip">
+            <span class="wallet-text">₹ <span id="headerChipBalance">0</span></span>
+            <span class="plus-icon wallet-plus">+</span>
+        </a>
+    </header>
+
+    <main class="main-content">
+        <div id="globalLoaderEl"><div class="fancy-spinner"></div></div>
+
+        <section id="landing-section" class="section"></section>
+        <section id="login-section" class="section"></section>
+        <section id="home-section" class="section"></section>
+        <section id="profile-section" class="section"></section>
+        <section id="wallet-section" class="section"></section>
+        <section id="withdraw-section" class="section"></section>
+        <section id="support-section" class="section"></section>
+        <section id="privacy-policy-section" class="section"></section>
+        <section id="history-section" class="section"></section>
+        <section id="leaderboard-section" class="section"></section>
+        <section id="tournaments-section" class="section"></section>
+        <section id="match-details-section" class="section"></section>
+        <section id="match-result-section" class="section"></section>
+        <section id="slot-selection-section" class="section"></section>
+        <section id="player-details-section" class="section"></section>
+    </main>
+
+    <div class="bottom-nav-container" id="bottomNav">
+        <div class="nav-fab-wrapper">
+            <div class="nav-fab active" data-section="home-section" id="navHomeFab"><i class="fas fa-home"></i></div>
+        </div>
+        <nav class="bottom-nav-bar">
+            <button class="nav-item" data-section="home-section" data-label="Home"><i class="fas fa-house"></i></button>
+            <button class="nav-item" data-section="tournaments-section" data-label="Tournaments"><i class="fas fa-trophy"></i></button>
+            <button class="nav-item" data-section="wallet-section" data-label="Wallet"><i class="fas fa-wallet"></i></button>
+            <button class="nav-item" data-section="profile-section" data-label="Profile"><i class="fas fa-user"></i></button>
+            <button class="nav-item" data-section="history-section" data-label="Matches"><i class="fas fa-gamepad"></i></button>
+            <button class="nav-item" data-section="leaderboard-section" data-label="Leaderboard"><i class="fas fa-chart-bar"></i></button>
+        </nav>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+
+    <script type="module">
+        // ============================================================
+        // WITHDRAW MODE CONFIG
+        // ============================================================
+        // 'winning' = Sirf winning balance withdraw hoga (RECOMMENDED)
+        // 'total'   = Pura balance (deposit + winning) withdraw hoga
+        const WITHDRAW_MODE = 'winning';
+        // ============================================================
+
+        const firebaseConfig = {
+  apiKey: "AIzaSyA3fNyRMF5t72onxyJeuskFjupEF4j2Xaw",
+  authDomain: "turnament-6ae3a.firebaseapp.com",
+  databaseURL: "https://turnament-6ae3a-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "turnament-6ae3a",
+  storageBucket: "turnament-6ae3a.firebasestorage.app",
+  messagingSenderId: "294167492000",
+  appId: "1:294167492000:web:e00bbcbc9728acfd56e0c5",
+  measurementId: "G-N9VBE727BY"
+};
+
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
+        import { getDatabase, ref, get, set, push, serverTimestamp, onValue, runTransaction, update } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-database.js";
+        import { getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
+
+        let app, db, auth;
+        try { app = initializeApp(firebaseConfig); db = getDatabase(app); auth = getAuth(app); } catch (e) { throw e; }
+
+        const getElement = (id) => document.getElementById(id);
+        const querySel = (sel) => document.querySelector(sel);
+
+        let currentUser = null;
+        let userProfile = {};
+        let appSettings = {};
+        let supportLinks = {};
+        let dbListeners = {};
+        const MINECRAFT_GAME_NAME = 'Minecraft';
+        const MINECRAFT_APP_NAME = 'MineZone';
+        let minecraftGame = null;
+
+        const showLoader = (show) => getElement('globalLoaderEl').style.display = show ? 'flex' : 'none';
+        const safeClick = (id, cb) => { const el = getElement(id); if(el) el.onclick = cb; };
+
+        // ==========================================
+        // MODAL
+        // ==========================================
+        const Modal = {
+            _overlay: null,
+            _resolve: null,
+            _init() {
+                if (this._overlay) return;
+                const div = document.createElement('div');
+                div.className = 'custom-modal-overlay';
+                div.innerHTML = `
+                    <div class="custom-modal-box">
+                        <div class="custom-modal-icon info" id="cmIcon"><i class="fas fa-info"></i></div>
+                        <div class="custom-modal-title" id="cmTitle">Title</div>
+                        <div class="custom-modal-message" id="cmMessage">Message</div>
+                        <div class="custom-modal-actions" id="cmActions"></div>
+                    </div>
+                `;
+                document.body.appendChild(div);
+                this._overlay = div;
+            },
+            _show({ icon = 'info', title = '', message = '', buttons = [] }) {
+                this._init();
+                const iconMap = { success: 'fa-check', error: 'fa-times', warning: 'fa-exclamation', info: 'fa-info', confirm: 'fa-question' };
+                const iconEl = getElement('cmIcon');
+                iconEl.className = 'custom-modal-icon ' + icon;
+                iconEl.innerHTML = `<i class="fas ${iconMap[icon] || 'fa-info'}"></i>`;
+                getElement('cmTitle').textContent = title;
+                getElement('cmMessage').innerHTML = message;
+                const actionsEl = getElement('cmActions');
+                actionsEl.innerHTML = '';
+                buttons.forEach(btn => {
+                    const b = document.createElement('button');
+                    b.className = 'custom-modal-btn ' + (btn.class || 'primary');
+                    b.textContent = btn.text;
+                    b.onclick = () => {
+                        this._hide();
+                        if (btn.onClick) btn.onClick();
+                        if (this._resolve) { this._resolve(btn.value); this._resolve = null; }
+                    };
+                    actionsEl.appendChild(b);
+                });
+                this._overlay.classList.add('show');
+            },
+            _hide() { if (this._overlay) this._overlay.classList.remove('show'); },
+            alert(message, title = 'Notice', icon = 'info') {
+                return new Promise(resolve => {
+                    this._resolve = resolve;
+                    this._show({ icon, title, message, buttons: [{ text: 'OK', class: 'primary', value: true }] });
+                });
+            },
+            success(message, title = 'Success') { return this.alert(message, title, 'success'); },
+            error(message, title = 'Error') { return this.alert(message, title, 'error'); },
+            warning(message, title = 'Warning') { return this.alert(message, title, 'warning'); },
+            confirm(message, title = 'Confirm', confirmText = 'Yes', cancelText = 'No') {
+                return new Promise(resolve => {
+                    this._resolve = resolve;
+                    this._show({
+                        icon: 'confirm', title, message,
+                        buttons: [
+                            { text: cancelText, class: 'secondary', value: false },
+                            { text: confirmText, class: 'danger', value: true }
+                        ]
+                    });
+                });
+            },
+            editProfile(profile) {
+                return new Promise(resolve => {
+                    this._init();
+                    getElement('cmIcon').className = 'custom-modal-icon info';
+                    getElement('cmIcon').innerHTML = `<i class="fas fa-user-edit"></i>`;
+                    getElement('cmTitle').textContent = 'Edit Profile';
+                    getElement('cmMessage').innerHTML = `
+                        <div class="edit-profile-field">
+                            <label>Display Name</label>
+                            <input type="text" id="epName" value="${(profile.displayName || '').replace(/"/g, '&quot;')}" placeholder="Your name">
+                        </div>
+                        <div class="edit-profile-field">
+                            <label>Phone Number</label>
+                            <input type="tel" id="epPhone" value="${(profile.phone || '').replace(/"/g, '&quot;')}" placeholder="+91 XXXXXXXXXX">
+                        </div>
+                        <div class="edit-profile-field">
+                            <label>Email (read-only)</label>
+                            <input type="email" value="${(profile.email || '').replace(/"/g, '&quot;')}" disabled>
+                        </div>
+                    `;
+                    const actionsEl = getElement('cmActions');
+                    actionsEl.innerHTML = '';
+                    const cancelBtn = document.createElement('button');
+                    cancelBtn.className = 'custom-modal-btn secondary';
+                    cancelBtn.textContent = 'Cancel';
+                    cancelBtn.onclick = () => { this._hide(); resolve(null); };
+                    const saveBtn = document.createElement('button');
+                    saveBtn.className = 'custom-modal-btn success';
+                    saveBtn.textContent = 'Save';
+                    saveBtn.onclick = () => {
+                        const name = getElement('epName').value.trim();
+                        const phone = getElement('epPhone').value.trim();
+                        if (!name) { Modal.warning('Please enter a name.'); return; }
+                        this._hide();
+                        resolve({ displayName: name, phone });
+                    };
+                    actionsEl.appendChild(cancelBtn);
+                    actionsEl.appendChild(saveBtn);
+                    this._overlay.classList.add('show');
+                });
+            }
+        };
+
+        // ==========================================
+        // THEME
+        // ==========================================
+        function applyTheme(theme) {
+            document.body.classList.remove('theme-light', 'theme-white', 'theme-black', 'theme-blue', 'theme-green');
+            const themeMap = { 'light': 'theme-light', 'white': 'theme-white', 'black': 'theme-black', 'blue': 'theme-blue', 'green': 'theme-green', 'dark': '' };
+            const cls = themeMap[theme];
+            if (cls) document.body.classList.add(cls);
+            if (appSettings.accentPrimary) document.documentElement.style.setProperty('--accent-cyan', appSettings.accentPrimary);
+            if (appSettings.accentSecondary) document.documentElement.style.setProperty('--accent-pink', appSettings.accentSecondary);
+            if (appSettings.btnGreen) document.documentElement.style.setProperty('--btn-green', appSettings.btnGreen);
+            if (appSettings.btnOrange) document.documentElement.style.setProperty('--btn-orange', appSettings.btnOrange);
+        }
+
+        async function loadAppSettings() {
+            try {
+                const snap = await get(ref(db, 'settings'));
+                if (snap.exists()) {
+                    appSettings = snap.val();
+                    if (appSettings.appName) document.title = appSettings.appName;
+                    applyTheme(appSettings.theme || 'dark');
+                    supportLinks = appSettings.supportLinks || {};
+                }
+            } catch(e) { console.error('Settings load error:', e); }
+        }
+
+        // ==========================================
+        // TRANSACTIONS
+        // ==========================================
+        async function logTransaction(uid, amount, type, desc) {
+            try {
+                await push(ref(db, `user_transactions/${uid}`), {
+                    amount: parseFloat(amount), type, description: desc, timestamp: serverTimestamp()
+                });
+            } catch(e) { console.error("Log error:", e); }
+        }
+
+        async function loadWalletTransactions() {
+            const list = getElement('transactionList');
+            if(!list) return;
+            list.innerHTML = '<div class="text-center p-3"><div class="spinner-border text-light"></div></div>';
+            try {
+                const q = ref(db, `user_transactions/${currentUser.uid}`);
+                const snap = await get(q);
+                if (!snap.exists()) {
+                    list.innerHTML = '<div style="text-align:center; color:var(--text-secondary); margin-top:30px;">No transactions yet.</div>';
+                    return;
+                }
+                const data = [];
+                snap.forEach(c => data.push(c.val()));
+                data.reverse();
+                let html = '';
+                data.forEach(t => {
+                    const color = t.type === 'credit' ? '#4CAF50' : '#FF3D71';
+                    const sign = t.type === 'credit' ? '+' : '-';
+                    const date = t.timestamp ? new Date(t.timestamp).toLocaleDateString() : 'Recent';
+                    html += `
+                        <div class="animate-enter" style="display:flex; justify-content:space-between; align-items:center; padding:12px 0; border-bottom:1px solid var(--border-color);">
+                            <div>
+                                <div style="color:var(--text-primary); font-weight:500;">${t.description}</div>
+                                <div style="color:var(--text-secondary); font-size:0.75rem;">${date}</div>
+                            </div>
+                            <div style="color:${color}; font-weight:700; font-size:1rem;">${sign}₹${parseFloat(t.amount).toFixed(2)}</div>
+                        </div>
+                    `;
+                });
+                list.innerHTML = html;
+            } catch (e) {
+                list.innerHTML = '<div class="text-danger text-center">Failed to load history.</div>';
+            }
+        }
+
+        // ==========================================
+        // PAGE RENDERER
+        // ==========================================
+        function renderPageContent(sectionId, data = {}) {
+            const section = getElement(sectionId);
+            if (!section) return;
+
+            const dynamicSections = [
+                'match-details-section',
+                'tournaments-section',
+                'slot-selection-section',
+                'player-details-section',
+                'match-result-section'
+            ];
+
+            if (dynamicSections.includes(sectionId)) {
+                section.innerHTML = '';
+            } else {
+                if (section.innerHTML.trim() !== '') return;
+            }
+
+            let content = '';
+            if (sectionId === 'landing-section') {
+                content = `
+                    <div class="landing-shell">
+                        <div class="landing-top">
+                            <div class="mine-logo"><div class="mine-logo-mark">M</div><div class="mine-logo-name">Mine<span>Zone</span></div></div>
+                            <div class="landing-badge"><i class="fas fa-cube"></i> Minecraft only</div>
+                        </div>
+                        <div class="landing-hero">
+                            <div class="block-scene"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+                            <div class="pixel-avatar"></div>
+                            <div class="landing-copy">
+                                <div class="landing-eyebrow">The Ultimate Minecraft Community</div>
+                                <h1>Play. <span>Compete.</span><br>Build Your Legacy.</h1>
+                                <p>Join Minecraft tournaments, meet competitive players, track your matches and compete for rewards — all in one place.</p>
+                                <div class="landing-actions">
+                                    <button class="landing-btn landing-btn-primary" id="landingGetStartedBtn">Get Started <i class="fas fa-arrow-right ms-2"></i></button>
+                                    <button class="landing-btn landing-btn-secondary" id="landingSignInBtn">Sign In</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="landing-features">
+                            <div class="landing-feature"><i class="fas fa-trophy"></i>Minecraft Tournaments</div>
+                            <div class="landing-feature"><i class="fas fa-users"></i>Player Community</div>
+                            <div class="landing-feature"><i class="fas fa-chart-line"></i>Track Your Stats</div>
+                        </div>
+                    </div>`;
+            } else if (sectionId === 'login-section') {
+                const logoUrl = appSettings.userAppLogoUrl || 'https://placehold.co/80x80/2cff73/03101d?text=M';
+                content = `
+                <div class="auth-wrapper">
+                    <button class="public-back" id="backToLandingBtn"><i class="fas fa-arrow-left"></i> Back to MineZone</button>
+                    <div class="auth-card">
+                        <div class="auth-logo-area">
+                            <img src="${logoUrl}" alt="MineZone" class="auth-logo-img" onerror="this.src='https://placehold.co/80x80/2cff73/03101d?text=M'">
+                            <div class="auth-app-name">MineZone</div>
+                            <div class="auth-tagline">Play • Compete • Build • Earn</div>
+                        </div>
+                        <div class="auth-divider"><div class="auth-divider-line"></div><div class="auth-divider-text">Secure Login</div><div class="auth-divider-line"></div></div>
+                        <form id="emailLoginForm">
+                            <div class="auth-form-title">Welcome Back</div><div class="auth-form-subtitle">Sign in to continue your Minecraft journey</div>
+                            <div class="auth-input-group"><label>Email Address</label><input type="email" id="loginEmailInputEl" placeholder="you@example.com" required><i class="fas fa-envelope auth-input-icon"></i></div>
+                            <div class="auth-input-group"><label>Password</label><input type="password" id="loginPasswordInputEl" placeholder="Enter your password" required><i class="fas fa-lock auth-input-icon"></i></div>
+                            <button type="button" id="loginEmailBtnEl" class="auth-btn-primary">Sign In <i class="fas fa-arrow-right ms-2"></i></button>
+                            <div class="auth-switch-text">Don't have an account? <a class="auth-switch-link" id="showSignupToggleBtnEl">Sign Up</a></div>
+                        </form>
+                        <form id="emailSignupForm" style="display:none;">
+                            <div class="auth-form-title">Create Your Account</div><div class="auth-form-subtitle">Join MineZone and start competing</div>
+                            <div class="auth-input-group"><label>Full Name</label><input type="text" id="signupNameInputEl" placeholder="Enter your name" required><i class="fas fa-user auth-input-icon"></i></div>
+                            <div class="auth-input-group"><label>Email Address</label><input type="email" id="signupEmailInputEl" placeholder="you@example.com" required><i class="fas fa-envelope auth-input-icon"></i></div>
+                            <div class="auth-input-group"><label>Password</label><input type="password" id="signupPasswordInputEl" placeholder="Create a password" required><i class="fas fa-lock auth-input-icon"></i></div>
+                            <button type="button" id="signupEmailBtnEl" class="auth-btn-primary">Create Account <i class="fas fa-user-plus ms-2"></i></button>
+                            <div class="auth-switch-text">Already have an account? <a class="auth-switch-link" id="showLoginToggleBtnEl">Sign In</a></div>
+                        </form>
+                        <div class="auth-features"><div class="auth-feature-item"><div class="auth-feature-icon"><i class="fas fa-cube"></i></div><div class="auth-feature-label">Minecraft Only</div></div><div class="auth-feature-item"><div class="auth-feature-icon"><i class="fas fa-shield-halved"></i></div><div class="auth-feature-label">Secure</div></div><div class="auth-feature-item"><div class="auth-feature-icon"><i class="fas fa-trophy"></i></div><div class="auth-feature-label">Compete</div></div></div>
+                    </div>
+                </div>`;
+            } else if (sectionId === 'home-section') {
+                const heroImage = minecraftGame?.imageUrl || '';
+                const heroStyle = heroImage ? `style="--minecraft-hero:url('${heroImage.replace(/'/g, "\\'")}')"` : '';
+                content = `
+                    <div class="home-topbar animate-enter"><div class="home-brand"><div class="home-brand-mark">M</div><div><strong>MineZone</strong><small>Minecraft competitive hub</small></div></div><div class="home-notify"><i class="fas fa-bell"></i></div></div>
+                    <div class="minecraft-hero animate-enter" ${heroStyle}><div class="minecraft-hero-content"><div class="minecraft-pill"><i class="fas fa-cube"></i> MINECRAFT ONLY</div><h1>Play Minecraft.<br><span>Compete & Win.</span></h1><p>Join Minecraft tournaments, battle other players and build your competitive profile.</p><button class="minecraft-hero-btn" id="minecraftExploreBtn">Explore Tournaments <i class="fas fa-arrow-right ms-1"></i></button></div></div>
+                    <div class="dashboard-stats animate-enter"><div class="dashboard-stat"><i class="fas fa-gamepad"></i><strong>${userProfile.matchesPlayed || 0}</strong><span>Matches Played</span></div><div class="dashboard-stat"><i class="fas fa-crosshairs"></i><strong>${userProfile.totalKills || 0}</strong><span>Total Kills</span></div><div class="dashboard-stat"><i class="fas fa-trophy"></i><strong>₹${Number(userProfile.totalWinnings || 0).toFixed(0)}</strong><span>Total Winnings</span></div></div>
+                    <div class="home-section-title"><h2>Quick Actions</h2></div>
+                    <div class="quick-actions animate-enter"><div class="quick-action" id="quickTournaments"><i class="fas fa-trophy"></i><span>Tournaments</span></div><div class="quick-action" id="quickMatches"><i class="fas fa-gamepad"></i><span>My Matches</span></div><div class="quick-action" id="quickWallet"><i class="fas fa-wallet"></i><span>Wallet</span></div><div class="quick-action" id="quickProfile"><i class="fas fa-user"></i><span>Profile</span></div></div>
+                    <div class="home-section-title"><h2>Latest Minecraft Tournaments</h2><a id="homeViewAllTournaments">View All <i class="fas fa-arrow-right"></i></a></div>
+                    <div id="minecraftTournamentsPreview" class="minecraft-mini-list animate-enter"><div class="empty-minecraft"><i class="fas fa-spinner fa-spin"></i><br>Loading Minecraft tournaments...</div></div>`;
+            } else if (sectionId === 'profile-section') {
+                content = `
+                    <div class="profile-new-header animate-enter">
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="profile-new-avatar" id="profileCardAvatar"></div>
+                            <div class="profile-new-info">
+                                <h3 id="profileCardName">User</h3>
+                                <p id="profileCardPhone">Not set</p>
+                            </div>
+                        </div>
+                        <div class="profile-edit-btn" id="editProfileBtn" title="Edit Profile"><i class="fas fa-pen"></i></div>
+                    </div>
+                    <div class="profile-stats-card animate-enter" style="animation-delay: 0.1s;">
+                        <div class="p-stat-item"><i class="p-stat-icon fas fa-gamepad"></i><span class="p-stat-val count-up" data-val="0">0</span><span class="p-stat-label">Matches Played</span></div>
+                        <div class="p-stat-item"><i class="p-stat-icon fas fa-fire"></i><span class="p-stat-val count-up" data-val="0">0</span><span class="p-stat-label">Total Kills</span></div>
+                        <div class="p-stat-item"><i class="p-stat-icon fas fa-trophy"></i><span class="p-stat-val count-up" data-prefix="₹" data-val="0.00">₹0.00</span><span class="p-stat-label">Total Winnings</span></div>
+                    </div>
+                    <div class="profile-menu-card animate-enter" style="animation-delay: 0.2s;">
+                        <a class="p-menu-item" data-section="history-section"><i class="p-menu-icon fas fa-history"></i><span class="p-menu-text">My Matches</span><i class="p-menu-arrow fas fa-chevron-right"></i></a>
+                        <a class="p-menu-item" data-section="wallet-section"><i class="p-menu-icon fas fa-file-invoice-dollar"></i><span class="p-menu-text">Transaction History</span><i class="p-menu-arrow fas fa-chevron-right"></i></a>
+                        <div class="menu-divider"></div>
+                        <a class="p-menu-item" data-section="support-section"><i class="p-menu-icon fas fa-headset"></i><span class="p-menu-text">Customer Support</span><i class="p-menu-arrow fas fa-chevron-right"></i></a>
+                        <a class="p-menu-item" data-section="privacy-policy-section"><i class="p-menu-icon fas fa-shield-halved"></i><span class="p-menu-text">Privacy Policy</span><i class="p-menu-arrow fas fa-chevron-right"></i></a>
+                        <a class="p-menu-item" id="aboutUsBtn"><i class="p-menu-icon fas fa-circle-info"></i><span class="p-menu-text">About Us</span><i class="p-menu-arrow fas fa-chevron-right"></i></a>
+                        <div class="menu-divider"></div>
+                        <a class="p-menu-item" id="logoutBtn"><i class="p-menu-icon fas fa-right-from-bracket text-red"></i><span class="p-menu-text text-red">Logout</span><i class="p-menu-arrow fas fa-chevron-right"></i></a>
+                    </div>`;
+            } else if (sectionId === 'wallet-section') {
+                const totalBal = parseFloat(userProfile.balance || 0);
+                const winBal = parseFloat(userProfile.winningBalance || 0);
+                const depBal = Math.max(0, totalBal - winBal);
+                content = `
+                    <div class="wallet-card animate-enter">
+                        <div class="wallet-label">Total Balance</div>
+                        <div class="wallet-balance">₹<span id="walletPageTotalBalance">${totalBal.toFixed(2)}</span></div>
+                        <div class="wallet-divider"></div>
+                        <div class="wallet-details">
+                            <div>
+                                <div class="wallet-label">Deposit</div>
+                                <div class="wallet-sub-value">₹<span id="walletPageDeposit">${depBal.toFixed(2)}</span></div>
+                            </div>
+                            <div class="text-end">
+                                <div class="wallet-label">Winnings</div>
+                                <div class="wallet-sub-value">₹<span id="walletPageWinnings">${winBal.toFixed(2)}</span></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="wallet-actions animate-enter" style="animation-delay: 0.1s;">
+                        <button class="btn-action btn-add" id="addMoneyBtn"><i class="fas fa-plus-circle"></i> ADD MONEY</button>
+                        <button class="btn-action btn-withdraw" id="withdrawBtn"><i class="fas fa-wallet"></i> WITHDRAW</button>
+                    </div>
+                    <div class="transactions-section animate-enter" style="animation-delay: 0.2s;">
+                        <h3 style="font-size:1.1rem; font-weight:600; margin-bottom:15px; color:var(--text-primary);">Recent Transactions</h3>
+                        <div id="transactionList" style="text-align:center; color:var(--text-secondary); margin-top:50px;">No transactions yet.</div>
+                    </div>`;
+            } else if (sectionId === 'withdraw-section') {
+                // ✅ FIX: Withdraw page pe winningBalance show karo (agar WITHDRAW_MODE='winning')
+                const totalBal = parseFloat(userProfile.balance || 0);
+                const winBal = parseFloat(userProfile.winningBalance || 0);
+                const withdrawable = WITHDRAW_MODE === 'winning' ? winBal : totalBal;
+                content = `
+                    <div class="withdraw-balance-card animate-enter">
+                        <div class="wb-left"><i class="fas fa-wallet wb-icon"></i><span>Withdrawable Balance</span></div>
+                        <div class="wb-amount">₹<span id="withdrawPageBalance">${withdrawable.toFixed(2)}</span></div>
+                    </div>
+                    <div class="withdraw-form animate-enter" style="animation-delay: 0.1s;">
+                        <div class="mb-3"><input type="number" class="form-control custom-input" id="withdrawAmount" placeholder="Amount to Withdraw (₹50 - ₹5000)"></div>
+                        <div class="mb-3"><input type="text" class="form-control custom-input" id="withdrawUpi" placeholder="Your UPI ID (e.g., yourname@upi)"></div>
+                        <button class="btn-cyan-block" id="submitWithdrawBtn">Submit Request</button>
+                    </div>`;
+            } else if (sectionId === 'support-section') {
+                const links = supportLinks || {};
+                const makeCard = (id, icon, iconClass, name, url) => {
+                    if (!url) return '';
+                    return `<div class="support-card" id="${id}"><div class="support-icon ${iconClass}"><i class="${icon}"></i></div><div class="support-name">${name}</div></div>`;
+                };
+                content = `
+                    <div class="support-grid animate-enter">
+                        ${makeCard('btnSupportWhatsapp', 'fab fa-whatsapp', 'icon-whatsapp', 'WhatsApp', links.whatsapp)}
+                        ${makeCard('btnSupportTelegram', 'fab fa-telegram-plane', 'icon-telegram', 'Telegram', links.telegram)}
+                        ${makeCard('btnSupportInstagram', 'fab fa-instagram', 'icon-instagram', 'Instagram', links.instagram)}
+                        ${makeCard('btnSupportYoutube', 'fab fa-youtube', 'icon-youtube', 'YouTube', links.youtube)}
+                        ${makeCard('btnSupportEmail', 'fas fa-envelope', 'icon-email', 'Email', links.email)}
+                        ${makeCard('btnSupportWebsite', 'fas fa-globe', 'icon-website', 'Website', links.website)}
+                    </div>`;
+            } else if (sectionId === 'privacy-policy-section') {
+                content = `
+                    <div class="privacy-container animate-enter" style="padding: 5px;">
+                        <div id="privacyContentLoader" class="text-center mt-5"><div class="spinner-border text-light"></div></div>
+                        <div id="privacyPolicyContent" class="privacy-content" style="display:none;"></div>
+                    </div>
+                `;
+            } else if (sectionId === 'history-section') {
+                content = `
+                    <div class="tournament-tabs animate-enter" style="margin-top:10px;">
+                        <button class="tab-item active" data-status="upcoming">Upcoming</button>
+                        <button class="tab-item" data-status="ongoing">Ongoing</button>
+                        <button class="tab-item" data-status="completed">Completed</button>
+                    </div>
+                    <div id="tournamentsListContainerEl" class="animate-enter" style="padding-bottom:80px;">
+                        <div class="text-center p-5"><div class="spinner-border text-light"></div></div>
+                    </div>
+                `;
+            } else if (sectionId === 'tournaments-section') {
+                content = `<div class="tournament-tabs animate-enter"><button class="tab-item active" data-status="upcoming">Upcoming</button><button class="tab-item" data-status="ongoing">Ongoing</button><button class="tab-item" data-status="completed">Results</button></div><div id="tournamentsListContainerEl" class="animate-enter" style="animation-delay: 0.1s;"></div>`;
+            } else if (sectionId === 'match-details-section') {
+                const banner = data.bannerUrl || data.gameImage || 'https://via.placeholder.com/600x300';
+                const title = data.name || "Match Title";
+                const date = (data.matchDate || "Upcoming") + ", " + (data.matchTime || "");
+                let isJoined = false;
+                if (currentUser && data.participants) {
+                    isJoined = Object.values(data.participants).some(p => p.userId === currentUser.uid);
+                }
+                let footerHtml = '';
+                if (isJoined) {
+                    footerHtml = `<div class="md-fixed-footer"><button class="btn-join-match" style="background: linear-gradient(90deg, #28a745, #218838); cursor: default; box-shadow:none;">ALREADY JOINED <i class="fas fa-check-circle"></i></button></div>`;
+                } else if (data.status === 'completed') {
+                    footerHtml = `<div style="padding: 0 20px 30px;"><button class="btn-view-result" id="btnViewResult">🏆 VIEW WINNERS & RESULT</button></div>`;
+                } else {
+                    footerHtml = `<div class="md-fixed-footer"><button class="btn-join-match" id="mdJoinBtn">JOIN NOW (₹${data.entryFee || 0})</button></div>`;
+                }
+                let participantsHtml = '<div class="text-center p-3 text-secondary">No participants yet.</div>';
+                if(data.participants) {
+                    participantsHtml = Object.values(data.participants).map((p, i) =>
+                        `<div class="participant-row"><span class="participant-index">${i+1}</span><span class="participant-name">${p.inGameName}</span></div>`
+                    ).join('');
+                }
+                let prizesHtml = `
+                    <div class="prize-row"><div class="prize-rank"><i class="fas fa-trophy prize-icon"></i> Rank #1</div><div class="prize-amount">₹${(data.prizePool * 0.5).toFixed(0)}</div></div>
+                    <div class="prize-row"><div class="prize-rank">Rank #2</div><div class="prize-amount">₹${(data.prizePool * 0.3).toFixed(0)}</div></div>
+                    <div class="prize-row"><div class="prize-rank">Per Kill</div><div class="prize-amount">₹${data.perKill || 0}</div></div>
+                `;
+                content = `
+                <div class="md-container animate-enter">
+                    <div class="md-header-overlay"><button class="md-back-btn" id="mdBackBtn"><i class="fas fa-arrow-left"></i></button></div>
+                    <img src="${banner}" class="md-banner" onerror="this.src='https://via.placeholder.com/600x300/151530/00E0FF?text=MATCH'">
+                    <div class="md-title-overlay">
+                        <h4 class="text-white-50 small text-uppercase mb-1" style="font-size:0.7rem; letter-spacing:2px;">Tournament</h4>
+                        <h2 class="md-match-title">${title}</h2>
+                    </div>
+                    <div class="md-meta-grid">
+                        <div class="md-meta-item"><div class="md-meta-label">TYPE</div><div class="md-meta-val"><i class="fas fa-user"></i> ${data.type || 'Solo'}</div></div>
+                        <div class="md-meta-item"><div class="md-meta-label">VERSION</div><div class="md-meta-val"><i class="fas fa-eye"></i> TPP</div></div>
+                        <div class="md-meta-item"><div class="md-meta-label">MAP</div><div class="md-meta-val"><i class="fas fa-map"></i> ${data.map || 'Bermuda'}</div></div>
+                    </div>
+                    <div class="md-time-card"><i class="fas fa-clock md-time-icon"></i><span class="md-time-text">${date}</span></div>
+                    <div class="md-stats-grid">
+                        <div class="md-stat-card"><h5>PRIZE POOL</h5><span>₹${data.prizePool}</span></div>
+                        <div class="md-stat-card"><h5>PER KILL</h5><span>₹${data.perKill}</span></div>
+                        <div class="md-stat-card"><h5>ENTRY FEE</h5><span>₹${data.entryFee}</span></div>
+                    </div>
+                    <div class="md-tabs">
+                        <button class="md-tab active" data-tab="about">ABOUT</button>
+                        <button class="md-tab" data-tab="prizes">PRIZES</button>
+                        <button class="md-tab" data-tab="participants">PARTICIPANTS</button>
+                    </div>
+                    <div class="md-content-box">
+                        <div id="tab-about" class="tab-content-area active">
+                            <div class="md-section-title">MATCH RULES</div>
+                            <div class="md-text-block">${data.rules ? data.rules.replace(/\n/g, '<br>') : 'No rules specified.'}</div>
+                        </div>
+                        <div id="tab-prizes" class="tab-content-area">${prizesHtml}</div>
+                        <div id="tab-participants" class="tab-content-area">${participantsHtml}</div>
+                    </div>
+                    ${footerHtml}
+                </div>`;
+            }
+            else if (sectionId === 'match-result-section') {
+                const title = data.name || "Match Result";
+                const date = data.matchDate || "Date";
+                content = `
+                    <div style="position:sticky; top:0; background:var(--bg-primary); padding: 10px 0;">
+                        <div class="d-flex align-items-center gap-3">
+                             <button class="border-0 bg-transparent fs-5" id="resBackBtn" style="color:var(--text-primary);"><i class="fas fa-arrow-left"></i></button>
+                             <div class="fs-5 fw-bold" style="color:var(--text-primary);">${title}</div>
+                        </div>
+                    </div>
+                    <div class="result-meta">Organised on ${date}</div>
+                    <div class="md-stats-grid">
+                        <div class="md-stat-card"><h5>PRIZE POOL</h5><span>₹${data.prizePool || 0}</span></div>
+                        <div class="md-stat-card"><h5>PER KILL</h5><span>₹${data.perKill || 0}</span></div>
+                        <div class="md-stat-card"><h5>ENTRY FEE</h5><span>₹${data.entryFee || 0}</span></div>
+                    </div>
+                    <div class="full-result-bar">FULL RESULT</div>
+                    <div class="result-table-header">
+                        <div>#</div><div>PLAYER NAME</div><div class="text-center">RANK</div><div class="text-center">KILLS</div><div class="text-end">WINNING</div>
+                    </div>
+                    <div class="result-list-container" id="realResultContainer">
+                        <div class="text-center p-5"><div class="spinner-border text-light"></div></div>
+                    </div>
+                `;
+                setTimeout(async () => {
+                    const listEl = document.getElementById('realResultContainer');
+                    if(!listEl) return;
+                    try {
+                        const snap = await get(ref(db, `tournaments/${data.id}/results`));
+                        if (snap.exists()) {
+                            let resultsArray = [];
+                            snap.forEach(child => resultsArray.push(child.val()));
+                            resultsArray.sort((a, b) => Number(a.rank) - Number(b.rank));
+                            const limitedResults = resultsArray.slice(0, 48);
+                            let rowsHtml = '';
+                            limitedResults.forEach((r, i) => {
+                                rowsHtml += `
+                                    <div class="result-item-row animate-enter" style="animation-delay: ${i * 0.03}s">
+                                        <div class="res-pos">${i+1}</div>
+                                        <div class="res-name">${r.name}</div>
+                                        <div class="res-rank-val">#${r.rank}</div>
+                                        <div class="res-kill">${r.kills}</div>
+                                        <div class="res-win">₹${Number(r.win).toFixed(2)}</div>
+                                    </div>`;
+                            });
+                            listEl.innerHTML = rowsHtml;
+                        } else {
+                            listEl.innerHTML = '<div class="text-center p-5 text-secondary">No results published yet.</div>';
+                        }
+                    } catch (e) {
+                        listEl.innerHTML = '<div class="text-center p-5 text-danger">Failed to load results.</div>';
+                    }
+                }, 100);
+            }
+            else if (sectionId === 'slot-selection-section') {
+                content = `
+                    <div class="slot-list-header"><span>SLOT</span><span>SELECT</span></div>
+                    <div class="slot-list-scroll" id="slotListContainer">
+                        <div class="text-center p-5"><div class="spinner-border text-light"></div></div>
+                    </div>
+                    <div class="slot-footer">
+                        <div class="slot-footer-info"><span>TOTAL ENTRY FEE</span><strong id="slotTotalFee">₹0</strong></div>
+                        <button class="btn-slot-next" id="slotNextBtn">NEXT</button>
+                    </div>`;
+            } else if (sectionId === 'player-details-section') {
+                content = `
+                    <div id="playerDetailsFormContainer"></div>
+                    <div class="details-footer">
+                        <div class="details-total-text">TOTAL FEE: <strong id="detailsTotalFee">₹0</strong></div>
+                        <button class="btn-details-confirm" id="btnConfirmJoin">CONFIRM & JOIN</button>
+                    </div>`;
+            } else if (sectionId === 'leaderboard-section') {
+                content = `<div class="d-flex flex-column justify-content-center align-items-center animate-enter" style="height:50vh"><p class="text-secondary text-center">No winners yet today.</p></div>`;
+            }
+            if(content) section.innerHTML = content;
+        }
+
+        // ==========================================
+        // HELPERS
+        // ==========================================
+        function animateCounter() {
+            document.querySelectorAll('.count-up').forEach(el => {
+                const target = parseFloat(el.getAttribute('data-val'));
+                const prefix = el.getAttribute('data-prefix') || '';
+                let start = 0;
+                const duration = 1000;
+                const step = target / (duration / 16);
+                function update() {
+                    start += step;
+                    if(start >= target) start = target;
+                    el.innerText = prefix + (target % 1 !== 0 ? start.toFixed(2) : Math.floor(start));
+                    if(start < target) requestAnimationFrame(update);
+                }
+                update();
+            });
+        }
+        function populateUserInfo(profile) {
+            getElement('headerUserGreeting').textContent = profile.displayName || 'Guest';
+            getElement('headerAvatar').textContent = (profile.displayName || 'GU').substring(0, 2).toUpperCase();
+            getElement('headerChipBalance').textContent = (profile.balance || 0).toFixed(0);
+        }
+        function populateProfilePage(profile) {
+            if (!getElement('profileCardAvatar')) return;
+            getElement('profileCardAvatar').textContent = (profile.displayName || 'US').substring(0, 2).toUpperCase();
+            getElement('profileCardName').textContent = profile.displayName || 'User';
+            getElement('profileCardPhone').textContent = profile.phone || profile.email || 'Not set';
+            const statEls = document.querySelectorAll('.p-stat-val');
+            if(statEls.length >= 3) {
+                statEls[0].setAttribute('data-val', profile.matchesPlayed || 0);
+                statEls[1].setAttribute('data-val', profile.totalKills || 0);
+                statEls[2].setAttribute('data-val', profile.totalWinnings || 0);
+            }
+        }
+
+        // ✅ FIXED: Balance & Withdrawable Balance properly synced
+        function setupRealtimeListeners(uid) {
+            detachAllDbListeners();
+            dbListeners.userProfile = onValue(ref(db, `users/${uid}`), (snapshot) => {
+                if (snapshot.exists()) {
+                    userProfile = snapshot.val();
+                    populateUserInfo(userProfile);
+                    if (getElement('profile-section').classList.contains('active')) populateProfilePage(userProfile);
+                    
+                    const totalBal = parseFloat(userProfile.balance || 0);
+                    const winBal = parseFloat(userProfile.winningBalance || 0);
+                    const depBal = Math.max(0, totalBal - winBal);
+                    
+                    // ✅ FIX: Withdrawable balance based on WITHDRAW_MODE
+                    const withdrawable = WITHDRAW_MODE === 'winning' ? winBal : totalBal;
+                    
+                    if(getElement('walletPageTotalBalance')) getElement('walletPageTotalBalance').textContent = totalBal.toFixed(2);
+                    if(getElement('walletPageDeposit')) getElement('walletPageDeposit').textContent = depBal.toFixed(2);
+                    if(getElement('walletPageWinnings')) getElement('walletPageWinnings').textContent = winBal.toFixed(2);
+                    if(getElement('withdrawPageBalance')) getElement('withdrawPageBalance').textContent = withdrawable.toFixed(2);
+                    if(getElement('headerChipBalance')) getElement('headerChipBalance').textContent = totalBal.toFixed(0);
+                } else {
+                    signOut(auth);
+                }
+            });
+        }
+        function detachAllDbListeners() { if(dbListeners.userProfile) dbListeners.userProfile(); dbListeners = {}; }
+
+        async function handleAuthStateChange(user) {
+            showLoader(true);
+            detachAllDbListeners();
+            currentUser = user;
+            if (user) {
+                const userRef = ref(db, 'users/' + user.uid);
+                const snapshot = await get(userRef);
+                if (!snapshot.exists()) {
+                    await set(userRef, { 
+                        uid: user.uid, 
+                        displayName: user.email.split('@')[0], 
+                        email: user.email, 
+                        balance: 0, 
+                        winningBalance: 0, 
+                        matchesPlayed: 0, 
+                        totalKills: 0, 
+                        totalWinnings: 0, 
+                        createdAt: serverTimestamp() 
+                    });
+                }
+                setupRealtimeListeners(user.uid);
+                document.body.classList.remove('login-active');
+                showSection('home-section');
+            } else {
+                userProfile = {};
+                document.body.classList.remove('login-active');
+                document.body.classList.add('public-active');
+                showSection('landing-section');
+            }
+            showLoader(false);
+        }
+
+        async function loadPromotions() {
+            if (typeof Swiper === 'undefined') return;
+            const wrapper = getElement('promotionSlider')?.querySelector('.swiper-wrapper');
+            if (!wrapper) return;
+            wrapper.innerHTML = '';
+            try {
+                const snap = await get(ref(db, 'promotions'));
+                if (snap.exists()) {
+                    const promotions = Object.values(snap.val()).filter(p => p.imageUrl);
+                    if (promotions.length === 0) {
+                        getElement('promotionSlider').style.display = 'none';
+                        return;
+                    }
+                    promotions.forEach(p => {
+                        wrapper.innerHTML += `<div class="swiper-slide"><a href="${p.link||'#'}"><img src="${p.imageUrl}"></a></div>`;
+                    });
+                    const useLoop = promotions.length >= 3;
+                    new Swiper(getElement('promotionSlider'), {
+                        slidesPerView: 1,
+                        spaceBetween: 10,
+                        centeredSlides: true,
+                        loop: useLoop,
+                        autoplay: useLoop ? { delay: 3000, disableOnInteraction: false } : false,
+                        pagination: { el: '.swiper-pagination', clickable: true }
+                    });
+                    getElement('promotionSlider').style.display = 'block';
+                } else {
+                    getElement('promotionSlider').style.display = 'none';
+                }
+            } catch (e) { console.error(e); }
+        }
+
+        async function loadGameCategories() {
+            const list = getElement('gamesListEl');
+            if (!list) return;
+            try {
+                const snap = await get(ref(db, 'games'));
+                const games = snap.exists() ? snap.val() : {};
+                const match = Object.entries(games).find(([id,g]) => g && g.name && String(g.name).toLowerCase().includes('minecraft'));
+                minecraftGame = match ? { id: match[0], ...match[1] } : { id:'minecraft', name:MINECRAFT_GAME_NAME, imageUrl:'' };
+                list.innerHTML = `<div class="minecraft-only-card animate-enter" id="minecraftGameCard"><div class="minecraft-only-icon">M</div><div><h3>Minecraft</h3><p>Survival, BedWars, SkyWars, Build Battles and more.</p></div><i class="fas fa-chevron-right" style="margin-left:auto;color:#2cff73;"></i></div>`;
+                safeClick('minecraftGameCard', () => showSection('tournaments-section',{gameId:minecraftGame.id,gameName:MINECRAFT_GAME_NAME,gameImage:minecraftGame.imageUrl}));
+            } catch(e) {
+                minecraftGame={id:'minecraft',name:MINECRAFT_GAME_NAME,imageUrl:''};
+                list.innerHTML='<div class="empty-minecraft">Minecraft is ready. No game image is configured by admin yet.</div>';
+            }
+        }
+
+        async function loadMinecraftHomeTournaments() {
+            const container=getElement('minecraftTournamentsPreview');
+            if(!container) return;
+            try {
+                if(!minecraftGame) await loadGameCategories();
+                const snap=await get(ref(db,'tournaments'));
+                const all=snap.exists()?snap.val():{};
+                const matches=Object.entries(all).filter(([,m])=>m && (m.gameId===minecraftGame.id || String(m.gameName||'').toLowerCase().includes('minecraft')) && m.status==='upcoming').slice(0,4);
+                if(!matches.length){container.innerHTML='<div class="empty-minecraft"><i class="fas fa-cube mb-2"></i><br>No upcoming Minecraft tournaments right now.</div>';return;}
+                container.innerHTML='';
+                matches.forEach(([id,m])=>{
+                    const card=document.createElement('div');card.className='minecraft-mini-card';
+                    const image=m.bannerUrl||m.gameImage||minecraftGame.imageUrl||'https://placehold.co/160x120/0b3045/2cff73?text=MINECRAFT';
+                    card.innerHTML=`<img src="${image}" onerror="this.src='https://placehold.co/160x120/0b3045/2cff73?text=MINECRAFT'" alt="Minecraft"><div><h3>${m.name||'Minecraft Tournament'}</h3><p><i class="fas fa-trophy"></i> ₹${m.prizePool||0} &nbsp; • &nbsp; Entry ₹${m.entryFee||0}</p><p style="margin-top:3px;"><i class="far fa-clock"></i> ${m.matchDate||'Upcoming'}${m.matchTime?', '+m.matchTime:''}</p></div><button class="mini-join">VIEW</button>`;
+                    card.onclick=()=>showSection('match-details-section',{...m,id});container.appendChild(card);
+                });
+            } catch(e){console.error('Minecraft tournaments load error:',e);container.innerHTML='<div class="empty-minecraft">Unable to load Minecraft tournaments.</div>';}
+        }
+
+        async function loadMatchesForCategory(gameId, status, gameData = {}) {
+            const container = getElement('tournamentsListContainerEl');
+            if (!container) return;
+            container.innerHTML = `<div class="text-center p-5"><div class="spinner-border text-light"></div></div>`;
+            try {
+                const snap = await get(ref(db, 'tournaments'));
+                const allMatches = snap.exists() ? snap.val() : {};
+                const matches = Object.entries(allMatches).filter(([, m]) => m.gameId === gameId && m.status === status);
+                if (matches.length === 0) {
+                    container.innerHTML = `<div class="text-center p-5 text-secondary animate-enter"><p>No ${status} matches found.</p></div>`;
+                    return;
+                }
+                renderMatchCards(container, matches, gameData.gameImage);
+            } catch (e) {
+                container.innerHTML = '<p class="text-center text-danger">Error loading matches.</p>';
+            }
+        }
+
+        async function loadUserMatches(status) {
+            const container = getElement('tournamentsListContainerEl');
+            if (!container) return;
+            container.innerHTML = `<div class="text-center p-5"><div class="spinner-border text-light"></div></div>`;
+            try {
+                const [tournamentsSnap, gamesSnap] = await Promise.all([get(ref(db, 'tournaments')), get(ref(db, 'games'))]);
+                const allMatches = tournamentsSnap.exists() ? tournamentsSnap.val() : {};
+                const allGames = gamesSnap.exists() ? gamesSnap.val() : {};
+                const matches = Object.entries(allMatches).filter(([, m]) => {
+                    const isStatusMatch = m.status === status;
+                    let isJoined = false;
+                    if(m.participants && currentUser) {
+                         isJoined = Object.values(m.participants).some(p => p.userId === currentUser.uid);
+                    }
+                    return isStatusMatch && isJoined;
+                });
+                if (matches.length === 0) {
+                    container.innerHTML = `<div class="text-center p-5 text-secondary animate-enter"><i class="fas fa-ghost fa-2x mb-3"></i><p>You haven't joined any ${status} contests.</p></div>`;
+                    return;
+                }
+                matches.forEach(([, m]) => { if (m.gameId && allGames[m.gameId]) m.fallbackGameImage = allGames[m.gameId].imageUrl; });
+                renderMatchCards(container, matches, null);
+            } catch(e) {
+                container.innerHTML = '<p class="text-center text-danger p-5">Error loading your matches.</p>';
+            }
+        }
+
+        function renderMatchCards(container, matches, defaultImage) {
+            container.innerHTML = '';
+            const FALLBACK_IMG = "https://placehold.co/600x338/151530/00E0FF?text=GAME+ZONE";
+            matches.forEach(([id, m]) => {
+                const d = document.createElement('div');
+                d.className = 'tournament-card animate-enter';
+                let bannerSrc = FALLBACK_IMG;
+                if (m.bannerUrl && m.bannerUrl.length > 5) bannerSrc = m.bannerUrl;
+                else if (defaultImage && defaultImage.length > 5) bannerSrc = defaultImage;
+                const filled = m.filledSlots || 0;
+                const total = m.totalSlots || 100;
+                const progressPct = Math.min((filled / total) * 100, 100);
+                let dateStr = m.matchDate || "Upcoming";
+                if(m.matchTime) dateStr += `, ${m.matchTime}`;
+                d.innerHTML = `
+                    <img src="${bannerSrc}" class="t-banner-img" onerror="this.onerror=null;this.src='${FALLBACK_IMG}';">
+                    <div class="t-content-body">
+                        <div class="t-header-row"><h4 class="t-title-text">${m.name}</h4><img src="https://img.icons8.com/emoji/48/bomb-emoji.png" width="20" height="20"></div>
+                        <div class="t-date-row"><i class="far fa-calendar-alt"></i> <span>${dateStr}</span></div>
+                        <div class="t-stats-row">
+                            <div class="t-stat-box"><span class="t-stat-label">PRIZE POOL</span><span class="t-stat-value">₹${m.prizePool || 0}</span></div>
+                            <div class="t-stat-box"><span class="t-stat-label">PER KILL</span><span class="t-stat-value">₹${m.perKill || 0}</span></div>
+                            <div class="t-stat-box"><span class="t-stat-label">ENTRY FEE</span><span class="t-stat-value">₹${m.entryFee || 0}</span></div>
+                        </div>
+                        <div class="t-progress-area">
+                            <div class="t-progress-track"><div class="t-progress-bar" style="width: ${progressPct}%"></div></div>
+                            <div class="t-slots-text">${filled}/${total} Slots Filled</div>
+                        </div>
+                    </div>`;
+                d.onclick = () => showSection('match-details-section', { ...m, id: id });
+                container.appendChild(d);
+            });
+        }
+
+        let selectedSlots = [];
+        async function renderSlotSelection(data) {
+            const container = getElement('slotListContainer');
+            const totalFeeEl = getElement('slotTotalFee');
+            selectedSlots = [];
+            totalFeeEl.textContent = "₹0";
+            const takenSlots = [];
+            try {
+                const snap = await get(ref(db, `tournaments/${data.id}/participants`));
+                if (snap.exists()) Object.keys(snap.val()).forEach(key => takenSlots.push(parseInt(key)));
+            } catch (e) { console.error(e); }
+            container.innerHTML = '';
+            const totalSlots = data.totalSlots || 100;
+            for (let i = 1; i <= totalSlots; i++) {
+                const isTaken = takenSlots.includes(i);
+                const row = document.createElement('div');
+                row.className = `slot-row animate-enter ${isTaken ? 'disabled' : ''}`;
+                row.style.animationDelay = (i * 0.01) + 's';
+                row.innerHTML = `<div class="slot-number">${i}</div><div class="slot-checkbox"></div>`;
+                if (!isTaken) {
+                    row.onclick = () => {
+                        selectedSlots = [];
+                        document.querySelectorAll('.slot-row').forEach(r => r.classList.remove('active'));
+                        row.classList.add('active');
+                        selectedSlots.push(i);
+                        const fee = parseFloat(data.entryFee || 0);
+                        totalFeeEl.textContent = "₹" + fee;
+                    };
+                }
+                container.appendChild(row);
+            }
+        }
+
+        function renderPlayerDetails(data) {
+            const container = getElement('playerDetailsFormContainer');
+            const totalFeeEl = getElement('detailsTotalFee');
+            const slots = data.selectedSlots || [];
+            totalFeeEl.textContent = "₹" + (slots.length * parseFloat(data.entryFee || 0));
+            container.innerHTML = '';
+            slots.forEach((slotNum, index) => {
+                const div = document.createElement('div');
+                div.className = 'details-card animate-enter';
+                div.style.animationDelay = (index * 0.1) + 's';
+                div.innerHTML = `
+                    <div class="details-title">Player for Slot #${slotNum}</div>
+                    <div class="details-input-box">
+                        <label class="details-label">In-Game Name</label>
+                        <input type="text" class="details-input slot-ign" data-slot="${slotNum}" placeholder="Enter Name">
+                    </div>`;
+                container.appendChild(div);
+            });
+            const btn = getElement('btnConfirmJoin');
+            if(btn) btn.classList.add('ready');
+        }
+
+        async function loadPrivacyPolicy() {
+            const container = getElement('privacyPolicyContent');
+            const loader = getElement('privacyContentLoader');
+            if(!container) return;
+            const defaultPrivacy = `<h2>Privacy Policy</h2><p>Last Updated: Today</p><h4>1. Introduction</h4><p>We are committed to protecting your privacy.</p>`;
+            try {
+                const snap = await get(ref(db, 'settings/privacyPolicy'));
+                if(snap.exists() && snap.val()) container.innerHTML = snap.val();
+                else container.innerHTML = defaultPrivacy;
+            } catch(e) { container.innerHTML = defaultPrivacy; }
+            finally { if(loader) loader.style.display = 'none'; container.style.display = 'block'; }
+        }
+
+        // ==========================================
+        // SECTION NAVIGATION
+        // ==========================================
+        function showSection(sectionId, data = {}) {
+            window.scrollTo(0, 0);
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            const targetSection = getElement(sectionId);
+            if(targetSection) {
+                renderPageContent(sectionId, data);
+                targetSection.classList.add('active');
+                attachEventListenersForSection(sectionId, data);
+            }
+            document.querySelectorAll('.nav-item').forEach(item => {
+                if(item.dataset.section === sectionId) item.classList.add('active');
+                else item.classList.remove('active');
+            });
+            const homeFab = getElement('navHomeFab');
+            if (sectionId === 'home-section') homeFab.classList.add('active');
+            else homeFab.classList.remove('active');
+
+            const isHomePage = sectionId === 'home-section';
+            const isLoginPage = sectionId === 'login-section';
+            const isLandingPage = sectionId === 'landing-section';
+            const isPublicPage = isLoginPage || isLandingPage;
+            const isMatchDetails = sectionId === 'match-details-section';
+
+            document.body.classList.toggle('login-active', isLoginPage);
+            document.body.classList.toggle('public-active', isLandingPage);
+            if (isPublicPage) {
+                getElement('app-header').style.display='none';
+                getElement('bottomNav').style.display='none';
+                return;
+            }
+
+            getElement('app-header').style.display = isMatchDetails ? 'none' : 'flex';
+            getElement('headerUserInfo').style.display = isHomePage ? 'flex' : 'none';
+            getElement('headerBackBtn').style.display = isHomePage ? 'none' : 'block';
+            getElement('headerPageTitle').style.display = isHomePage ? 'none' : 'block';
+
+            const walletChip = getElement('headerWalletChip');
+            if(walletChip) walletChip.style.display = isHomePage ? 'flex' : 'none';
+
+            const hideNavPages = ['login-section', 'support-section', 'withdraw-section', 'privacy-policy-section', 'match-details-section', 'slot-selection-section', 'player-details-section', 'match-result-section'];
+            const bottomNav = getElement('bottomNav');
+            if(bottomNav) bottomNav.style.display = hideNavPages.includes(sectionId) ? 'none' : 'block';
+
+            if (!isHomePage && !isMatchDetails) {
+                let title = sectionId.replace('-section', '').replace(/^\w/, c => c.toUpperCase());
+                if(sectionId === 'wallet-section') title = 'My Wallet';
+                if(sectionId === 'withdraw-section') title = 'Withdraw Money';
+                if(sectionId === 'support-section') title = 'Customer Support';
+                if(sectionId === 'privacy-policy-section') title = 'Privacy Policy';
+                if(sectionId === 'slot-selection-section') title = 'Choose Your Slot';
+                if(sectionId === 'player-details-section') title = 'Enter Player Details';
+                if(sectionId === 'tournaments-section') {
+                    if (data.gameName) title = data.gameName;
+                    else if (data.mode === 'my_matches') title = "My Contests";
+                }
+                getElement('headerPageTitle').textContent = title;
+            }
+            if(sectionId === 'profile-section') setTimeout(animateCounter, 100);
+            if (sectionId === 'wallet-section') loadWalletTransactions();
+            if (sectionId === 'history-section') {
+                loadUserMatches('upcoming');
+                querySel('#history-section').querySelectorAll('.tab-item').forEach(t => {
+                    t.onclick = () => {
+                        querySel('#history-section').querySelectorAll('.tab-item').forEach(x => x.classList.remove('active'));
+                        t.classList.add('active');
+                        loadUserMatches(t.dataset.status);
+                    };
+                });
+            }
+        }
+
+        // ==========================================
+        // EVENT LISTENERS
+        // ==========================================
+        function attachEventListenersForSection(sectionId, data) {
+            if (sectionId === 'home-section') {
+                loadGameCategories(); loadMinecraftHomeTournaments();
+                const openMinecraft=()=>{const game=minecraftGame||{id:'minecraft',name:MINECRAFT_GAME_NAME};showSection('tournaments-section',{gameId:game.id,gameName:MINECRAFT_GAME_NAME,gameImage:game.imageUrl});};
+                safeClick('minecraftExploreBtn',openMinecraft);safeClick('homeViewAllTournaments',openMinecraft);safeClick('quickTournaments',openMinecraft);
+                safeClick('quickMatches',()=>showSection('history-section'));safeClick('quickWallet',()=>showSection('wallet-section'));safeClick('quickProfile',()=>showSection('profile-section'));
+            }
+            if (sectionId === 'landing-section') {
+                safeClick('landingGetStartedBtn',()=>showSection('login-section'));safeClick('landingSignInBtn',()=>showSection('login-section'));
+            }
+            if (sectionId === 'login-section') {
+                safeClick('backToLandingBtn',()=>showSection('landing-section'));
+                safeClick('loginEmailBtnEl', async () => {
+                    const e = getElement('loginEmailInputEl').value, p = getElement('loginPasswordInputEl').value;
+                    if(!e||!p) return Modal.warning('Please fill all fields.');
+                    showLoader(true);
+                    try { await signInWithEmailAndPassword(auth, e, p); }
+                    catch(x) { Modal.error('Login failed: ' + (x.message || 'Invalid credentials')); }
+                    finally { showLoader(false); }
+                });
+                safeClick('signupEmailBtnEl', async () => {
+                    const n = getElement('signupNameInputEl').value, e = getElement('signupEmailInputEl').value, p = getElement('signupPasswordInputEl').value;
+                    if(!n||!e||!p) return Modal.warning('Please fill all fields.');
+                    showLoader(true);
+                    try {
+                        const c = await createUserWithEmailAndPassword(auth, e, p);
+                        await set(ref(db, `users/${c.user.uid}`), { 
+                            uid: c.user.uid, 
+                            displayName: n, 
+                            email: e, 
+                            balance: 0, 
+                            winningBalance: 0, 
+                            matchesPlayed: 0, 
+                            totalKills: 0, 
+                            totalWinnings: 0, 
+                            createdAt: serverTimestamp() 
+                        });
+                    } catch(x) { Modal.error('Signup failed: ' + (x.message || 'Try again')); }
+                    finally { showLoader(false); }
+                });
+                safeClick('showSignupToggleBtnEl', () => { getElement('emailLoginForm').style.display = 'none'; getElement('emailSignupForm').style.display = 'block'; });
+                safeClick('showLoginToggleBtnEl', () => { getElement('emailLoginForm').style.display = 'block'; getElement('emailSignupForm').style.display = 'none'; });
+            }
+            if (sectionId === 'profile-section') {
+                populateProfilePage(userProfile);
+                safeClick('editProfileBtn', async () => {
+                    const result = await Modal.editProfile(userProfile);
+                    if (!result) return;
+                    showLoader(true);
+                    try {
+                        await update(ref(db, `users/${currentUser.uid}`), {
+                            displayName: result.displayName,
+                            phone: result.phone
+                        });
+                        showLoader(false);
+                        await Modal.success('Profile updated successfully!', 'Updated');
+                    } catch (err) {
+                        showLoader(false);
+                        Modal.error('Failed to update profile: ' + err.message);
+                    }
+                });
+                safeClick('logoutBtn', async (e) => {
+                    e.preventDefault();
+                    const ok = await Modal.confirm('Are you sure you want to logout?', 'Logout', 'Yes, Logout', 'Cancel');
+                    if(ok) signOut(auth);
+                });
+                safeClick('aboutUsBtn', (e) => {
+                    e.preventDefault();
+                    const about = appSettings.aboutUs || 'A premium esports tournament platform. Play, win, and earn!';
+                    Modal.alert(about, 'About Us', 'info');
+                });
+                querySel('#profile-section').querySelectorAll('.p-menu-item[data-section]').forEach(i => {
+                    i.onclick = (e) => { e.preventDefault(); showSection(i.dataset.section); };
+                });
+            }
+            if(sectionId === 'tournaments-section') {
+                const isMyMatches = data.mode === 'my_matches';
+                if(isMyMatches) getElement('headerPageTitle').innerText = "My Contests";
+                else if(data.gameName) getElement('headerPageTitle').innerText = data.gameName;
+                const initStatus = data.status || 'upcoming';
+                querySel('#tournaments-section').querySelectorAll('.tab-item').forEach(t => {
+                    if(t.dataset.status === initStatus) t.classList.add('active');
+                    else t.classList.remove('active');
+                });
+                if(isMyMatches) loadUserMatches(initStatus);
+                else if (data.gameId) loadMatchesForCategory(data.gameId, initStatus, data);
+                querySel('#tournaments-section').querySelectorAll('.tab-item').forEach(t => {
+                    t.onclick = () => {
+                        document.querySelectorAll('#tournaments-section .tab-item').forEach(x => x.classList.remove('active'));
+                        t.classList.add('active');
+                        const status = t.dataset.status;
+                        if(isMyMatches) loadUserMatches(status);
+                        else if (data.gameId) loadMatchesForCategory(data.gameId, status, data);
+                    };
+                });
+            }
+            if(sectionId === 'match-details-section') {
+                safeClick('mdBackBtn', () => {
+                    if (data.gameId) showSection('tournaments-section', { gameId: data.gameId, gameName: data.gameName, gameImage: data.gameImage });
+                    else showSection('home-section');
+                });
+                document.querySelectorAll('.md-tab').forEach(tab => {
+                    tab.onclick = () => {
+                        document.querySelectorAll('.md-tab').forEach(t => t.classList.remove('active'));
+                        document.querySelectorAll('.tab-content-area').forEach(c => c.classList.remove('active'));
+                        tab.classList.add('active');
+                        const targetId = `tab-${tab.getAttribute('data-tab')}`;
+                        const targetContent = document.getElementById(targetId);
+                        if(targetContent) targetContent.classList.add('active');
+                    };
+                });
+                safeClick('mdJoinBtn', async () => {
+                    if(!userProfile) return Modal.warning('Please login first.');
+                    const fee = parseFloat(data.entryFee || 0);
+                    if(userProfile.balance < fee) {
+                        const ok = await Modal.confirm('Insufficient Balance. Add Money?', 'Low Balance', 'Add Money', 'Cancel');
+                        if(ok) showSection('wallet-section');
+                    } else {
+                        showSection('slot-selection-section', data);
+                    }
+                });
+                safeClick('btnViewResult', () => showSection('match-result-section', data));
+            }
+            if (sectionId === 'match-result-section') {
+                safeClick('resBackBtn', () => showSection('match-details-section', data));
+            }
+            if(sectionId === 'slot-selection-section') {
+                renderSlotSelection(data);
+                safeClick('slotNextBtn', async () => {
+                    if(selectedSlots.length === 0) return Modal.warning('Please select at least one slot.');
+                    const totalCost = selectedSlots.length * parseFloat(data.entryFee || 0);
+                    if(userProfile.balance < totalCost) {
+                        Modal.error('Insufficient Balance for ' + selectedSlots.length + ' slots.');
+                        return showSection('wallet-section');
+                    }
+                    showSection('player-details-section', { ...data, selectedSlots: selectedSlots });
+                });
+            }
+            if(sectionId === 'player-details-section') {
+                renderPlayerDetails(data);
+                safeClick('btnConfirmJoin', async () => {
+                    const inputs = document.querySelectorAll('.details-input');
+                    let isValid = true;
+                    const participantsData = {};
+                    inputs.forEach(input => {
+                        if(!input.value.trim()) isValid = false;
+                        const slot = input.getAttribute('data-slot');
+                        if(!participantsData[slot]) participantsData[slot] = {};
+                        participantsData[slot]['ign'] = input.value.trim();
+                    });
+                    if(!isValid) return Modal.warning('Please fill all player details.');
+                    const totalCost = data.selectedSlots.length * parseFloat(data.entryFee || 0);
+                    showLoader(true);
+                    try {
+                        const userBalRef = ref(db, `users/${currentUser.uid}/balance`);
+                        const result = await runTransaction(userBalRef, (currentBal) => {
+                            if (currentBal === null) return 0;
+                            if (currentBal >= totalCost) return currentBal - totalCost;
+                            return;
+                        });
+                        if (result.committed) {
+                            await logTransaction(currentUser.uid, totalCost, 'debit', `Joined Match: Slot ${data.selectedSlots.join(',')}`);
+                            const updates = {};
+                            data.selectedSlots.forEach(slotNum => {
+                                const pData = participantsData[slotNum] || {};
+                                updates[`tournaments/${data.id}/participants/${slotNum}`] = {
+                                    userId: currentUser.uid,
+                                    inGameName: pData.ign || 'Player',
+                                    slot: slotNum,
+                                    joinedAt: serverTimestamp()
+                                };
+                            });
+                            const newFilledCount = (data.filledSlots || 0) + data.selectedSlots.length;
+                            updates[`tournaments/${data.id}/filledSlots`] = newFilledCount;
+                            await update(ref(db), updates);
+                            showLoader(false);
+                            await Modal.success('You have successfully joined the match!', 'Joined!');
+                            showSection('history-section');
+                        } else {
+                            showLoader(false);
+                            Modal.error('Insufficient Balance or Transaction Failed.');
+                        }
+                    } catch (e) {
+                        console.error(e);
+                        showLoader(false);
+                        Modal.error('Error joining match: ' + e.message);
+                    }
+                });
+            }
+            if(sectionId === 'wallet-section') {
+                safeClick('addMoneyBtn', () => { window.location.href = 'addfund.html'; });
+                safeClick('withdrawBtn', () => showSection('withdraw-section'));
+            }
+            if(sectionId === 'withdraw-section') {
+                safeClick('submitWithdrawBtn', async () => {
+                    const amount = parseFloat(getElement('withdrawAmount').value);
+                    const upi = getElement('withdrawUpi').value.trim();
+                    if(!amount || amount < 50) return Modal.warning('Minimum withdrawal is ₹50.');
+                    if(!upi) return Modal.warning('Please enter a valid UPI ID.');
+                    
+                    // ✅ FIX: Check withdrawable balance based on mode
+                    const totalBal = parseFloat(userProfile.balance || 0);
+                    const winBal = parseFloat(userProfile.winningBalance || 0);
+                    const withdrawable = WITHDRAW_MODE === 'winning' ? winBal : totalBal;
+                    
+                    if(amount > withdrawable) {
+                        return Modal.warning(`You can withdraw up to ₹${withdrawable.toFixed(2)} only.`);
+                    }
+                    
+                    showLoader(true);
+                    try {
+                        if (WITHDRAW_MODE === 'winning') {
+                            // ✅ FIX: Deduct from BOTH winningBalance AND balance
+                            const winRef = ref(db, `users/${currentUser.uid}/winningBalance`);
+                            const winResult = await runTransaction(winRef, (currentBal) => {
+                                if (currentBal === null) return 0;
+                                if (currentBal >= amount) return currentBal - amount;
+                                return;
+                            });
+                            
+                            if (winResult.committed) {
+                                // Deduct from main balance too
+                                const balRef = ref(db, `users/${currentUser.uid}/balance`);
+                                await runTransaction(balRef, (currentBal) => {
+                                    if (currentBal === null) return 0;
+                                    if (currentBal >= amount) return currentBal - amount;
+                                    return;
+                                });
+                                
+                                await push(ref(db, 'withdrawals'), { 
+                                    userId: currentUser.uid, 
+                                    amount: amount, 
+                                    upi: upi, 
+                                    status: 'pending', 
+                                    timestamp: serverTimestamp() 
+                                });
+                                await logTransaction(currentUser.uid, amount, 'debit', 'Withdrawal Request (Winnings)');
+                                await Modal.success('Withdrawal Request Submitted Successfully!', 'Submitted');
+                                showSection('wallet-section');
+                            } else {
+                                Modal.error('Insufficient Winning Balance.');
+                            }
+                        } else {
+                            // WITHDRAW_MODE === 'total' - deduct from balance only
+                            const userRef = ref(db, `users/${currentUser.uid}/balance`);
+                            const result = await runTransaction(userRef, (currentBal) => {
+                                if (currentBal === null) return 0;
+                                if (currentBal >= amount) return currentBal - amount;
+                                return;
+                            });
+                            if (result.committed) {
+                                // Also try to reduce winningBalance proportionally (optional)
+                                await push(ref(db, 'withdrawals'), { 
+                                    userId: currentUser.uid, 
+                                    amount: amount, 
+                                    upi: upi, 
+                                    status: 'pending', 
+                                    timestamp: serverTimestamp() 
+                                });
+                                await logTransaction(currentUser.uid, amount, 'debit', 'Withdrawal Request');
+                                await Modal.success('Withdrawal Request Submitted Successfully!', 'Submitted');
+                                showSection('wallet-section');
+                            } else {
+                                Modal.error('Insufficient Balance.');
+                            }
+                        }
+                        showLoader(false);
+                    } catch (err) {
+                        console.error(err);
+                        Modal.error('Error processing withdrawal.');
+                        showLoader(false);
+                    }
+                });
+            }
+            if(sectionId === 'support-section') {
+                const links = supportLinks || {};
+                const open = (url) => {
+                    if(url) window.open(url, '_blank');
+                    else Modal.warning('This link is not set by admin yet.');
+                };
+                safeClick('btnSupportWhatsapp', () => open(links.whatsapp));
+                safeClick('btnSupportTelegram', () => open(links.telegram));
+                safeClick('btnSupportInstagram', () => open(links.instagram));
+                safeClick('btnSupportYoutube', () => open(links.youtube));
+                safeClick('btnSupportEmail', () => open(links.email));
+                safeClick('btnSupportWebsite', () => open(links.website));
+            }
+            if(sectionId === 'privacy-policy-section') loadPrivacyPolicy();
+        }
+
+        // ==========================================
+        // INIT
+        // ==========================================
+        document.addEventListener('DOMContentLoaded', async () => {
+            if(!auth) return;
+            showLoader(true);
+            document.querySelectorAll('.nav-item').forEach(i => i.addEventListener('click', (e) => { e.preventDefault(); showSection(i.dataset.section); }));
+            safeClick('navHomeFab', () => showSection('home-section'));
+            safeClick('headerWalletChip', (e) => { e.preventDefault(); showSection('wallet-section'); });
+            safeClick('headerBackBtn', () => {
+                const currentSection = document.querySelector('.section.active').id;
+                if(currentSection === 'withdraw-section') showSection('wallet-section');
+                else if(currentSection === 'privacy-policy-section') showSection('profile-section');
+                else if(currentSection === 'slot-selection-section') showSection('home-section');
+                else if(currentSection === 'player-details-section') showSection('home-section');
+                else if(currentSection === 'match-result-section') showSection('home-section');
+                else showSection('home-section');
+            });
+            await loadAppSettings();
+            onAuthStateChanged(auth, handleAuthStateChange);
+        });
+    </script>
+</body>
+</html>
